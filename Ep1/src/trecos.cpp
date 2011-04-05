@@ -1,0 +1,131 @@
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <GLUT/glut.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <list>
+
+using namespace std;
+
+#define WIDTH 640
+#define HEIGHT 480
+#define T_SIDE 40
+#define VMAX 10
+#define IDLE_INIT_TIME 40
+
+// Devolve um numero aleatorio entre 'low' e 'high'
+#define RANDOM(low, high) ((int)(low + ((double) rand () / ((double) RAND_MAX + 1)) * (high - low + 1)))
+
+float ColorDepthTablef[5][3]={
+  {0.0, 1.0, 1.0},
+  {0.0, 0.85, 0.85},
+  {0.0, 0.70, 0.70},
+  {0.0, 0.2, 0.2},
+  {0.0, 0.1, 0.1}
+  };
+
+class Treco {
+	int side, depth, x, y, vx, vy;
+public:
+	Treco(int x, int y, int d) {
+		side = T_SIDE;
+		this->depth = d;
+		this->x = x;
+		this->y = y;
+		vx = RANDOM(0, VMAX) * (RANDOM(0, 1)?1:-1);
+		vy = RANDOM(0, VMAX) * (RANDOM(0, 1)?1:-1);
+	}
+	void move() {
+		if (x + vx > WIDTH-(side/2)) vx *= -1;
+		else if (x + vx < (side/2)) vx *= -1;
+		else x += vx;
+		if (y + vy > HEIGHT-(side/2)) vy *= -1;
+		else if (y + vy < (side/2)) vy *= -1;
+		else y += vy;
+	}
+
+	void display() {
+		glPushMatrix();
+		glTranslatef(x, y, 0);
+		glColor3fv(ColorDepthTablef[depth]);
+		glRectf(-side/2, -side/2, side/2, side/2);
+		glPopMatrix();
+	}
+};
+
+list<Treco> L;
+
+void init() {
+	Treco* p;
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 4; j++) {
+			p = new Treco(RANDOM(T_SIDE/2, WIDTH-(T_SIDE/2)), RANDOM(T_SIDE/2, HEIGHT-(T_SIDE/2)), i);
+			L.push_front(*p);
+		}
+	}
+}
+
+
+void display () {
+
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, WIDTH, 0, HEIGHT);
+	glMatrixMode(GL_MODELVIEW);
+
+	list<Treco>::iterator p;
+	for (p=L.begin(); p != L.end(); p++)
+	{
+		p->move();
+		p->display();
+	}
+	glutSwapBuffers();
+}
+
+void time_out(int t) { // called if timer event
+	// ...advance the state of animation incrementally...
+	glutPostRedisplay(); // request redisplay
+	glutTimerFunc(t, time_out, t); // request next timer event
+}
+
+//void reshape(int w, int h) {
+//
+//   iHeight = h;
+//   iWidth = w;
+//   stepmh = (fmT-fmB)/(h/2);
+//   stepmw = (fmR-fmL)/w;
+//   stepjh = (fjT-fjB)/(h/2);
+//   stepjw = (fjR-fjL)/w;
+//
+//  glViewport(0,0,iWidth,iHeight);
+//}
+
+int main (int argc, char** argv) {
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInitWindowSize(WIDTH, HEIGHT);
+	glutCreateWindow(argv[0]);
+
+	glutDisplayFunc(display);
+	glutTimerFunc(IDLE_INIT_TIME, time_out, IDLE_INIT_TIME);
+
+	//  glutReshapeFunc(reshape);
+	//  glutMouseFunc(mouse);
+	//  glutKeyboardFunc(keyboard);
+
+	//  glutCreateMenu(mymenu);
+	//  glutAddMenuEntry("Reset", 0);
+	//  glutAddMenuEntry("Quit", 1);
+	//  glutAttachMenu(GLUT_MIDDLE_BUTTON);
+
+	/* initializacoes */
+	init();
+
+	glutMainLoop();
+
+	//finish();
+	return 0;
+}
