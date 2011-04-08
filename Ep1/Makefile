@@ -1,4 +1,4 @@
-GLFLAGS = -framework OpenGL -framework GLUT
+GLFLAGS = -lGL -lglut -lGLU
 CXXFLAGS =	-O2 -Wall
 
 SRC_DIR = src
