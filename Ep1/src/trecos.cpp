@@ -1,6 +1,15 @@
+#ifdef LINUX
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#endif
+
+#ifdef MACOS
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <GLUT/glut.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <list>
@@ -17,6 +26,8 @@ using namespace std;
 
 // Devolve um numero aleatorio entre 'low' e 'high'
 #define RANDOM(low, high) ((int)(low + ((double) rand () / ((double) RAND_MAX + 1)) * (high - low + 1)))
+
+bool paused = false;
 
 float ColorDepthTablef[10][3]={
     {0.00, 1.00, 1.00},
@@ -167,7 +178,8 @@ void time_out(int t) { // called if timer event
 
     // ...advance the state of animation incrementally...
     glutPostRedisplay(); // request redisplay
-    glutTimerFunc(t, time_out, t); // request next timer event
+    if (!paused)
+        glutTimerFunc(t, time_out, t); // request next timer event
 }
 
 void mouse (int btn, int st, int x, int y) {
@@ -201,13 +213,35 @@ void keyboard (unsigned char key, int x, int y) {
             reset();
             break;
 
+        case 'p':
+            if (paused) {
+                paused = false;
+                glutTimerFunc(IDLE_INIT_TIME, time_out, IDLE_INIT_TIME);
+            }
+            else
+                paused = true;
+            break;
+
+        case 'P':
+            if (paused) {
+                paused = false;
+                glutTimerFunc(IDLE_INIT_TIME, time_out, IDLE_INIT_TIME);
+            }
+            else
+                paused = true;
+            break;
+        case ' ':
+            if (paused)
+                glutTimerFunc(0, time_out, 0);
+            break;
+
         default:
             break;
     }
 }
-void reshape(int w, int h) {
-    glViewport(0, 0, w, h);
-}
+//void reshape(int w, int h) {
+//    glViewport(0, 0, w, h);
+//}
 
 int main (int argc, char** argv) {
     glutInit(&argc, argv);
@@ -217,8 +251,7 @@ int main (int argc, char** argv) {
 
     glutDisplayFunc(display);
     glutTimerFunc(IDLE_INIT_TIME, time_out, IDLE_INIT_TIME);
-
-    glutReshapeFunc(reshape);
+//    glutReshapeFunc(reshape);
     glutMouseFunc(mouse);
     glutKeyboardFunc(keyboard);
 
