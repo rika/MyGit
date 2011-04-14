@@ -205,17 +205,9 @@ void keyboard (unsigned char key, int x, int y) {
             break;
     }
 }
-//void reshape(int w, int h) {
-//
-//   iHeight = h;
-//   iWidth = w;
-//   stepmh = (fmT-fmB)/(h/2);
-//   stepmw = (fmR-fmL)/w;
-//   stepjh = (fjT-fjB)/(h/2);
-//   stepjw = (fjR-fjL)/w;
-//
-//  glViewport(0,0,iWidth,iHeight);
-//}
+void reshape(int w, int h) {
+    glViewport(0, 0, w, h);
+}
 
 int main (int argc, char** argv) {
     glutInit(&argc, argv);
@@ -226,7 +218,7 @@ int main (int argc, char** argv) {
     glutDisplayFunc(display);
     glutTimerFunc(IDLE_INIT_TIME, time_out, IDLE_INIT_TIME);
 
-    //  glutReshapeFunc(reshape);
+    glutReshapeFunc(reshape);
     glutMouseFunc(mouse);
     glutKeyboardFunc(keyboard);
 
