@@ -13,7 +13,7 @@ all: linux
 
 linux:
 	$(CXX) -c $(CXXFLAGS) -D LINUX -o $(SRC_DIR)/$(OBJS) $(SRC_DIR)/$(SRC)
-	$(CXX) $(CXXFLAGS) -$(LINUXFLAGS) o $(TARGET) $(SRC_DIR)/$(OBJS)
+	$(CXX) $(CXXFLAGS) $(LINUXFLAGS) -o $(TARGET) $(SRC_DIR)/$(OBJS)
 
 mac: $(SRC_DIR)/$(SRC)
 	$(CXX) -c $(CXXFLAGS) -D MACOS -o $(SRC_DIR)/$(OBJS) $(SRC_DIR)/$(SRC)

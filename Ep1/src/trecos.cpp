@@ -12,6 +12,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string>
+#include <sstream>
 #include <list>
 
 using namespace std;
@@ -38,6 +40,8 @@ float ftT= 1;
 
 float steptw, stepth;
 
+int score;
+
 bool paused;
 bool over;
 
@@ -53,6 +57,14 @@ float ColorDepthTablef[10][3]={
     {0.80, 0.00, 0.00},
     {0.70, 0.00, 0.00},
     {0.60, 0.00, 0.00}
+};
+
+int ScoreTable[5]={
+    -4000,
+    -2000,
+    -1000,
+    1000,
+    2000
 };
 
 class Square;
@@ -152,6 +164,8 @@ void init() {
 
     srand(time(NULL));
 
+    score = 0;
+
     over = false;
     paused = false;
 
@@ -174,7 +188,22 @@ void reset() {
     init();
 }
 
-
+void display_points() {
+    void * font = GLUT_BITMAP_9_BY_15;
+    stringstream ss;
+    string s;
+    ss << "Pontos: " << score;
+    s = ss.str();
+    glPushMatrix();
+    //glTranslatef(0.1, 0.1, 0);
+    glRasterPos2f(0.1, 0.1);
+    glColor3f(1.0, 1.0, 1.0); // Green
+    for (string::iterator i = s.begin(); i != s.end(); i++) {
+        char c = *i;
+        glutBitmapCharacter(font, c);
+    }
+    glPopMatrix();
+}
 void display () {
 
     glClearColor(0.05, 0.05, 0.2, 1.0);
@@ -195,8 +224,9 @@ void display () {
             if((*b).get_depth() == d)
                 b->display();
     }
+    display_points();
 
-   glutSwapBuffers();
+    glutSwapBuffers();
 }
 
 void reshape(int w, int h) {
@@ -227,6 +257,7 @@ void time_out(int t) { // called if timer event
     if (!game_over()) {
     	for (p=t_list.begin(); p != t_list.end(); p++) {
     		if (p->blow()) {
+                score += ScoreTable[p->get_depth()];
     			p = t_list.erase(p);
     			p--;
     		}
