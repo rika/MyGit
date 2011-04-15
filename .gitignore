@@ -1,3 +1,6 @@
 *.o
 trecos
 *.swp
+.project
+.cproject
+
