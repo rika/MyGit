@@ -21,8 +21,8 @@ using namespace std;
 #define B_SIDE 0.015
 #define VMIN 0.005
 #define VMAX 0.012
-#define FALL_TIME 12
-#define BLOW_TIME 16
+#define FALL_TIME 11
+#define BLOW_TIME 30
 #define IDLE_INIT_TIME 33
 
 // Devolve um numero aleatorio entre 'low' e 'high'
@@ -255,27 +255,26 @@ void time_out(int t) { // called if timer event
 void mouse(int btn, int st, int x, int y) {
     Bomb* b;
     float fcx, fcy;
-    if(!over && !paused) {
-    	if(btn==GLUT_LEFT_BUTTON) {
-    		if(st==GLUT_DOWN) {
-    			fcx = ftL + x * steptw;
-    			fcy = ftB + y * stepth;
-    			printf("left button pressed\n");
-    			printf("Coords:   x= %4i   y= %4i\n", x, y);
-    			printf("      : fcx= %.3f fcy= %.3f\n", fcx, fcy);
-    			b = new Bomb(fcx, fcy);
-    			b_list.push_front(*b);
-    		}
-    	}
-    	else if(btn==GLUT_RIGHT_BUTTON) {
-    		if(st==GLUT_DOWN) {
-    			if(paused)
-    				glutTimerFunc(0, time_out, 0);
-    			else
-    				paused = true;
-    		}
+    if(!over && !paused && btn==GLUT_LEFT_BUTTON) {
+    	if(st==GLUT_DOWN) {
+    		fcx = ftL + x * steptw;
+    		fcy = ftB + y * stepth;
+    		printf("left button pressed\n");
+    		printf("Coords:   x= %4i   y= %4i\n", x, y);
+    		printf("      : fcx= %.3f fcy= %.3f\n", fcx, fcy);
+    		b = new Bomb(fcx, fcy);
+    		b_list.push_front(*b);
     	}
     }
+    else if(btn==GLUT_RIGHT_BUTTON) {
+    	if(st==GLUT_DOWN) {
+    		if(paused)
+    			glutTimerFunc(0, time_out, 0);
+    		else
+    			paused = true;
+    	}
+    }
+
     glutPostRedisplay();
 }
 
@@ -312,6 +311,7 @@ void keyboard(unsigned char key, int x, int y) {
         		paused = !paused;
         	}
             break;
+
         case ' ':
             if(paused)
                 glutTimerFunc(0, time_out, 0);
