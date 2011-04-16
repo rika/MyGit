@@ -63,8 +63,8 @@ int ScoreTable[5]={
     -4000,
     -2000,
     -1000,
-    1000,
-    2000
+    +1000,
+    +2000
 };
 
 class Square;
@@ -84,7 +84,6 @@ public:
         this->x = x;
         this->y = y;
         depth = d;
-        printf("square (%.2f, %.2f)\n", x, y);
     }
     int get_depth() {
         return depth%5;
@@ -105,7 +104,6 @@ public:
         side = T_SIDE;
         vx = RANDOM(VMIN, VMAX) * ((RANDOM(0, 1)>0.5)?1:-1);
         vy = RANDOM(VMIN, VMAX) * ((RANDOM(0, 1)>0.5)?1:-1);
-//        printf("vx %2.2f, vy %2.2f, t %f\n", vx, vy, RANDOM(VMIN, VMAX));
     }
     void move() {
         if      (x + vx > ftR - (T_SIDE/2)) vx *= -1;
@@ -115,7 +113,6 @@ public:
         if      (y + vy > ftT - (T_SIDE/2)) vy *= -1;
         else if (y + vy < ftB + (T_SIDE/2)) vy *= -1;
         else y += vy;
-//        printf("%2d, %2d | %2d, %2d\n", x, y, vx, vy);
     }
     bool blow() {
     	if(depth >=5) {
@@ -124,7 +121,6 @@ public:
     			return true;
     	}
     	return false;
-
     }
     void hit() {
         depth += 5;
@@ -143,8 +139,6 @@ public:
             depth++;
             if (depth >= 5)
                 return true;
-            else
-                return false;
         }
         return false;
     }
@@ -163,9 +157,7 @@ void init() {
     Treco* p;
 
     srand(time(NULL));
-
     score = 0;
-
     over = false;
     paused = false;
 
@@ -188,22 +180,25 @@ void reset() {
     init();
 }
 
-void display_points() {
-    void * font = GLUT_BITMAP_9_BY_15;
-    stringstream ss;
-    string s;
-    ss << "Pontos: " << score;
-    s = ss.str();
-    glPushMatrix();
-    //glTranslatef(0.1, 0.1, 0);
-    glRasterPos2f(0.1, 0.1);
-    glColor3f(1.0, 1.0, 1.0); // Green
+void display_str(float x, float y, string s) {
+	void * font = GLUT_BITMAP_9_BY_15;
+	glPushMatrix();
+	glLoadIdentity();
+    glColor3f(1.0, 1.0, 1.0);
+    glRasterPos2f(x, y);
     for (string::iterator i = s.begin(); i != s.end(); i++) {
         char c = *i;
         glutBitmapCharacter(font, c);
     }
     glPopMatrix();
 }
+
+void display_score() {
+    stringstream ss;
+    ss << "Pontos: " << score;
+    display_str(0.1, 0.1, ss.str());
+}
+
 void display () {
 
     glClearColor(0.05, 0.05, 0.2, 1.0);
@@ -213,18 +208,22 @@ void display () {
     glLoadIdentity();
     gluOrtho2D(ftL, ftR, ftB, ftT);
     glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
-    list<Treco>::iterator t;
-    list<Bomb>::iterator b;
     for(int d = 4; d >= 0; d--) {
-        for(t=t_list.begin(); t != t_list.end(); t++)
+        for(list<Treco>::iterator t = t_list.begin(); t != t_list.end(); t++)
             if((*t).get_depth() == d)
                 t->display();
-        for(b=b_list.begin(); b != b_list.end(); b++)
+        for(list<Bomb>::iterator b = b_list.begin(); b != b_list.end(); b++)
             if((*b).get_depth() == d)
                 b->display();
     }
-    display_points();
+
+    display_score();
+    if (over) {
+    	display_str(0.3, 0.5, "Fim de Jogo");
+    	display_str(0.3, 0.4, "Aperte 'r' para recomeçar.");
+    }
 
     glutSwapBuffers();
 }
