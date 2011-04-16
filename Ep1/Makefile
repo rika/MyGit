@@ -12,14 +12,14 @@ TARGET=trecos
 all: linux
 
 linux:
-	$(CXX) -c $(CXXFLAGS) -D LINUX -o $(SRC_DIR)/$(OBJS) $(SRC_DIR)/$(SRC)
-	$(CXX) $(CXXFLAGS) $(LINUXFLAGS) -o $(TARGET) $(SRC_DIR)/$(OBJS)
+	$(CXX) -c $(CXXFLAGS) -D LINUX -o $(OBJS) $(SRC_DIR)/$(SRC)
+	$(CXX) $(CXXFLAGS) $(LINUXFLAGS) -o $(TARGET) $(OBJS)
 
 mac: $(SRC_DIR)/$(SRC)
-	$(CXX) -c $(CXXFLAGS) -D MACOS -o $(SRC_DIR)/$(OBJS) $(SRC_DIR)/$(SRC)
-	$(CXX) $(CXXFLAGS) $(MACOSFLAGS) -o $(TARGET) $(SRC_DIR)/$(OBJS)
+	$(CXX) -c $(CXXFLAGS) -D MACOS -o $(OBJS) $(SRC_DIR)/$(SRC)
+	$(CXX) $(CXXFLAGS) $(MACOSFLAGS) -o $(TARGET) $(OBJS)
 
 
 clean:
-	rm -f $(SRC_DIR)/$(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET)
 
