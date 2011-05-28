@@ -13,8 +13,6 @@ Para rodar: ./simulador
 
 Operação:
   MOUSE
-  botão esquerdo: solta uma bomba
-  botão direito: pause o jogo / roda um passo de debug
  
   TECLADO
   q: termina o programa

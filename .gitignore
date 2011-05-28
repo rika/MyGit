@@ -1,5 +1,6 @@
 *.o
 trecos
+simulador
 *.swp
 .project
 .cproject

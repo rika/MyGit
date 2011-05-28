@@ -231,7 +231,21 @@ void keyboard(unsigned char, int, int);
 
 
 void init() {
-    Treco* p;
+    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_shininess[] = { 50.0 };
+    GLfloat light_position[] = { 1.0, 1.0, -1.0, 0.0 };
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glShadeModel(GL_SMOOTH);
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_DEPTH_TEST);
+
+/*    Treco* p;
 
     srand(time(NULL));
     score = 0;
@@ -243,7 +257,7 @@ void init() {
             p = new Treco(RANDOM(ftL+T_SIDE/2, ftR-(T_SIDE/2)), RANDOM(ftB+T_SIDE/2, ftT-(T_SIDE/2)), i);
             t_list[i].push_front(*p);
         }
-    }
+    }*/
     steptw = (ftR-ftL)/width;
     stepth = (ftT-ftB)/height;
 }
@@ -307,12 +321,16 @@ void display_score() {
 
 void display() {
     glClearColor(0.05, 0.05, 0.2, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glutSolidSphere(1.0, 20, 16);
+/*
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(ftL, ftR, ftB, ftT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
 
     for(int d = 4; d >= 0; d--) {
         for(list<Treco>::iterator t = t_list[d].begin(); t != t_list[d].end(); t++) {
@@ -328,6 +346,7 @@ void display() {
         display_str(0.3, 0.5, "Fim de Jogo");
         display_str(0.3, 0.4, "Aperte 'r' para resetar.");
     }
+*/
     glutSwapBuffers();
 }
 
@@ -437,7 +456,7 @@ void keyboard(unsigned char key, int x, int y) {
         case 'Q':
             exit(0);
             break;
-
+/*
         case 'R':
             reset();
             break;
@@ -472,7 +491,7 @@ void keyboard(unsigned char key, int x, int y) {
             if(paused)
                 glutTimerFunc(0, step, 0);
             break;
-
+*/
         default:
             break;
     }
@@ -486,13 +505,14 @@ void keyboard(unsigned char key, int x, int y) {
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(width, height);
     glutCreateWindow(argv[0]);
+
     glutDisplayFunc(display);
-    glutTimerFunc(IDLE_INIT_TIME, step, IDLE_INIT_TIME);
+    //glutTimerFunc(IDLE_INIT_TIME, step, IDLE_INIT_TIME);
     glutReshapeFunc(reshape);
-    glutMouseFunc(mouse);
+    //glutMouseFunc(mouse);
     glutKeyboardFunc(keyboard);
 
     init();
