@@ -1,0 +1,26 @@
+Ep2 - MAC0420 Computacao grafica
+
+Nome: Ricardo Juliano Mesquita Silva Oda
+NUSP: 6514223
+
+Para compilar
+  no linux: make
+  no MacOS: make mac
+
+Para rodar: ./simulador
+
+// TODO
+
+Operação:
+  MOUSE
+  botão esquerdo: solta uma bomba
+  botão direito: pause o jogo / roda um passo de debug
+ 
+  TECLADO
+  q: termina o programa
+  r: reseta o jogo
+  p: pausa / despausa
+  espaço: roda um passo de debug
+ 
+nota: a impressao de debug so ocorre com o jogo pausado
+ 
