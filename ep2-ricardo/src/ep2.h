@@ -5,15 +5,15 @@
  * Objetivo uso de geometria 3D no OpenGL
 
  * Author: Hitoshi (hitoshi@ime.usp.br)
- * last update: abril de 2011
+ * 
+ * Alterado por Ricardo Oda (oda.ric@gmail.com)
+ * last update: maio de 2011
  */
 
-#include <GL/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#include "plane.h"
 
 /* ================================================================= */
 /* compilation and system options */
@@ -32,7 +32,7 @@ double FrustumFAR = 1000.0;
 /* ================================================================= */
 /* Velociy increments for translations and rotations */
 
-double DeltaVTrans = 5.0;
+double DeltaVTrans = 0.75;
 double DeltaVRoll  = 2.0;
 
 /* ================================================================= */
@@ -41,7 +41,7 @@ double DeltaVRoll  = 2.0;
 int iWidth=400, iHeight=300;	    // viewport
 int iMinX, iMaxX, iMinY, iMaxY;	    // sea rectangle
 int iMinLX, iMaxLX, iMinLY, iMaxLY; // island rectangle
-int *map;			    // elevation map
+int **map;			    // elevation map
 double curTime, oldTime;	    // time interval
 int maxElev;                        // max elevation
 int idle = 1;                       // pause the simulator

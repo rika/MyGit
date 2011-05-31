@@ -2,6 +2,7 @@ Ep2 - MAC0420 Computacao grafica
 
 Nome: Ricardo Juliano Mesquita Silva Oda
 NUSP: 6514223
+email: oda.ric@gmail.com
 
 Para compilar
   no linux: make
@@ -9,16 +10,18 @@ Para compilar
 
 Para rodar: ./simulador
 
-// TODO
-
 Operação:
-  MOUSE
- 
   TECLADO
+  a: acelera a nave atual
+  s: acelera negativamente a nave atual
+  d: para a nave atual
   q: termina o programa
-  r: reseta o jogo
   p: pausa / despausa
-  espaço: roda um passo de debug
- 
-nota: a impressao de debug so ocorre com o jogo pausado
- 
+  v: troca de aeronave
+
+IMPORTANTE:
+Todas funcionalidades do ep nao foram concluidas, algumas observacoes importantes:
+ - a parte de rotacao das naves nao foi implementada
+ - somente uma pseudo movimentacao no eixo Y foi implementada
+ - a ilha foi pintada com tons de verde, como nao foi disponibilizado o mapa de cores
+
