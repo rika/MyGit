@@ -51,10 +51,12 @@ bool paused = false;
 
 class Airplane {
 public:
+    int id;
     double x, y, z;
     double rx, ry, rz;
     double v;
-    Airplane(double x, double y, double z, double rx, double ry, double rz, double v) {
+    Airplane(int id, double x, double y, double z, double rx, double ry, double rz, double v) {
+        this->id = id;
         this->x = x;
         this->y = y;
         this->z = z;
@@ -155,7 +157,7 @@ void init() {
     for(int i = 0; i < n; i++) {
         double x, y, z, rx, ry, rz, v;
         val = fscanf(input, "%lf %lf %lf %lf %lf %lf %lf", &x, &y, &z, &rx, &ry, &rz, &v);
-        a = new Airplane(x, y, z, rx, ry, rz, v);
+        a = new Airplane(i, x, y, z, rx, ry, rz, v);
         ap_list.push_back(*a);
     }
 
@@ -265,6 +267,8 @@ void step(int t) {
     glutPostRedisplay();
     if (!paused)
         glutTimerFunc(t, step, t);
+    
+    printf("AVIAO %d: vel: %.2f pos: (%.2f %.2f %.2f)\n",actual_ap->id, actual_ap->v, actual_ap->x, actual_ap->y, actual_ap->z);
 }
 
 /* **************************************************************************
