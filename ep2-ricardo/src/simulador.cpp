@@ -354,7 +354,6 @@ int main(int argc, char** argv) {
     glutDisplayFunc(display);
     glutTimerFunc(IDLE_INIT_TIME, step, IDLE_INIT_TIME);
     glutReshapeFunc(reshape);
-    glutMouseFunc(mouse);
     glutKeyboardFunc(keyboard);
 
     glutMainLoop();
