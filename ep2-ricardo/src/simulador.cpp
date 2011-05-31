@@ -70,13 +70,10 @@ public:
         glColor3f(1.0f, 1.0f, 1.0f);
         glPushMatrix();
         glTranslated(x, y, z);
-        glRotated(rz, 0, 0, 1);
-        glRotated(ry, 0, 1, 0);
-        glRotated(rx, 1, 0, 0);
         glBegin(GL_TRIANGLES);
-        glNormal3f(0.0f, 1.0f, 0.0f);
+        glNormal3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(-1.0f, 0.0f, 0.5f); 
         glVertex3f( 1.0f, 0.0f, 0.5f);
-        glVertex3f(-1.0f, 0.0f, -0.5f); 
         glVertex3f( 0.0f, 0.0f, -0.5f);
         glEnd();
         glPopMatrix();
@@ -127,16 +124,16 @@ void init() {
     glEnable(GL_DEPTH_TEST);
 
     FILE* input = fopen(FileIn, "r");
-   
+    int val;
     // retangulo do mar
-    fscanf(input, "%d %d", &iMinX, &iMaxX);
-    fscanf(input, "%d %d", &iMinY, &iMaxY);
+    val = fscanf(input, "%d %d", &iMinX, &iMaxX);
+    val = fscanf(input, "%d %d", &iMinY, &iMaxY);
     // retangulo da ilha
-    fscanf(input, "%d %d", &iMinLX, &iMaxLX);
-    fscanf(input, "%d %d", &iMinLY, &iMaxLY);
+    val = fscanf(input, "%d %d", &iMinLX, &iMaxLX);
+    val = fscanf(input, "%d %d", &iMinLY, &iMaxLY);
 
     char file[128];
-    fscanf(input, "%s", file);
+    val = fscanf(input, "%s", file);
     FILE* terrain = fopen(file, "r");
 
     // mapa de elevacao
@@ -145,7 +142,7 @@ void init() {
     for(int i = 0; i < iMaxLX-iMinLX; i++) {
         map[i] = (int*) malloc((iMaxLY-iMinLY)*sizeof(int));
         for(int j = 0; j < iMaxLY-iMinLY; j++) {
-            fscanf(terrain, "%d", &map[i][j]);
+            val = fscanf(terrain, "%d", &map[i][j]);
             if(map[i][j] > maxElev) maxElev = map[i][j];
         }
     }
@@ -154,10 +151,10 @@ void init() {
     // avioes
     Airplane* a;
     int n;
-    fscanf(input, "%d", &n);
+    val = fscanf(input, "%d", &n);
     for(int i = 0; i < n; i++) {
         double x, y, z, rx, ry, rz, v;
-        fscanf(input, "%lf %lf %lf %lf %lf %lf %lf", &x, &y, &z, &rx, &ry, &rz, &v);
+        val = fscanf(input, "%lf %lf %lf %lf %lf %lf %lf", &x, &y, &z, &rx, &ry, &rz, &v);
         a = new Airplane(x, y, z, rx, ry, rz, v);
         ap_list.push_back(*a);
     }
