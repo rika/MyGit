@@ -18,7 +18,6 @@ linux:
 mac: $(SRC_DIR)/$(SRC)
 	$(CXX) -c $(CXXFLAGS) -D MACOS -o $(OBJS) $(SRC_DIR)/$(SRC)
 	$(CXX) $(CXXFLAGS) $(MACOSFLAGS) -o $(TARGET) $(OBJS)
-	$(CXX) $(CXXFLAGS) $(MACOSFLAGS) -o test test.cpp
 
 
 clean:

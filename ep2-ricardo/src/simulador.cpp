@@ -55,6 +55,7 @@ public:
     double x, y, z;
     double rx, ry, rz;
     double v;
+    double frame[16];
     Airplane(int id, double x, double y, double z, double rx, double ry, double rz, double v) {
         this->id = id;
         this->x = x;
@@ -64,31 +65,87 @@ public:
         this->ry = ry;
         this->rz = rz;
         this->v = v;
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+        glRotated(-rx, 1, 0, 0);
+        glRotated(-ry, 0, 1, 0);
+        glRotated(-rz, 0, 0, 1);
+        glTranslated(-x, -y, -z);
+        glGetDoublev(GL_MODELVIEW_MATRIX, frame);
+        glPopMatrix();
     }
     void display() {
+        glBegin(GL_TRIANGLES);
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse_plane);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular_plane);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess_plane);
         glColor3f(1.0f, 1.0f, 1.0f);
         glPushMatrix();
         glTranslated(x, y, z);
-        //glRotated(rz, 0, 0, 1);
-        //glRotated(ry, 0, 1, 0);
-        //glRotated(rx, 1, 0, 0);
-        glBegin(GL_TRIANGLES);
+        glRotated(rx, 1, 0, 0);
+        glRotated(ry, 0, 1, 0);
+        glRotated(rz, 0, 0, 1);
         glNormal3f(0.0f, 0.0f, 1.0f);
-        glVertex3f(-1.0f, -0.5f, 0.0f); 
-        glVertex3f( 1.0f, -0.5f, 0.0f);
-        glVertex3f( 0.0f, 0.5f, 0.0f);
+        glVertex3f(-1.0f, 0.0f, 0.5f); 
+        glVertex3f( 1.0f, 0.0f, 0.5f);
+        glVertex3f( 0.0f, 0.0f, -0.5f);
         glEnd();
         glPopMatrix();
     }
     void move() {
-        y += v;
+        x -= frame[2]*v;
+        y -= frame[6]*v;
+        z -= frame[10]*v;
+        
+        //glPushMatrix();
+        //glMatrixMode(GL_MODELVIEW);
+        //glLoadMatrixd(frame);
+        //glTranslated(x, y, z);
+        //glGetDoublev(GL_MODELVIEW_MATRIX, frame);
+        //glPopMatrix();
+        //printf("MOVE:\n");
+        //for(int i = 0; i < 16; i++) {printf("%.2lf ", frame[i]); if((i+1)%4==0) printf("\n");}
+        //glPushMatrix();
     }
     void look() {
-        gluLookAt(0, -15, 10, 0, 0, 0, 0, 0, 1);
+        GLdouble a[16] = {1, 0, 0, 0, 0, 0, 1, -150, 0, -1, 0, 50, 0, 0, 0, 1};
+
+        gluLookAt(0, 0, 0, 0, 0, -1, 0, 1, -1);
+        //gluLookAt(0, 0, 0, 0, 1, 0, 0, 1, 1);
+        glGetDoublev(GL_MODELVIEW_MATRIX, a);
+        printf("antes:\n");
+        for(int i = 0; i < 16; i++) {printf("%.2lf ", a[i]); if((i+1)%4==0) printf("\n");}
+        //glPushMatrix();
+        glLoadIdentity();
+        glRotated(-rx, 1, 0, 0);
+        glRotated(-ry, 0, 1, 0);
+        glRotated(-rz, 0, 0, 1);
         glTranslated(-x, -y, -z);
+        //glGetDoublev(GL_MODELVIEW_MATRIX, frame);
+        //glPopMatrix();
+        //glMultMatrixd(frame);
+
+
+        //glLoadIdentity();
+        //GLdouble b[16] = {1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, -50, -150, 1};
+        //glGetDoublev(GL_MODELVIEW_MATRIX, a);
+        //printf("trans:\n");
+        //for(int i = 0; i < 16; i++) {printf("%.2lf ", a[i]); if((i+1)%4==0) printf("\n");}
+
+        //glPushMatrix();
+        //glLoadIdentity();
+        //glMultMatrixd(frame);
+        //glGetDoublev(GL_MODELVIEW_MATRIX, a);
+        //printf("multi:\n");
+        //for(int i = 0; i < 16; i++) {printf("%.2lf ", a[i]); if((i+1)%4==0) printf("\n");}
+        //glPopMatrix();
+
+        //glTranslated(0, 0, -25);
+        //glGetDoublev(GL_MODELVIEW_MATRIX, a);
+        //printf("trans: ");
+        //for(int i = 0; i < 16; i++) printf("%.2lf ", a[i]); printf("\n");
+        
     }
 };
 
@@ -120,6 +177,7 @@ void init() {
     glClearColor(backR, backG, backB, backA);
     glEnable(GL_NORMALIZE);
     glShadeModel(GL_FLAT);
+
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -208,7 +266,7 @@ void display_ocean() {
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular_water);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess_water);
     glColor3f(0.0, 0.0, 1.0);
-    glNormal3i(0.0, 0.0, 1.0);
+    glNormal3f(0.0, 0.0, 1.0);
     glVertex3i(iMinX, iMinY, 0);
     glVertex3i(iMinX, iMaxY, 0);
     glVertex3i(iMaxX, iMaxY, 0);
