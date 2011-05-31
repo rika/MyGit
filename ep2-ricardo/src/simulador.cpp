@@ -70,11 +70,14 @@ public:
         glColor3f(1.0f, 1.0f, 1.0f);
         glPushMatrix();
         glTranslated(x, y, z);
+        //glRotated(rz, 0, 0, 1);
+        //glRotated(ry, 0, 1, 0);
+        //glRotated(rx, 1, 0, 0);
         glBegin(GL_TRIANGLES);
         glNormal3f(0.0f, 0.0f, 1.0f);
-        glVertex3f(-1.0f, 0.0f, 0.5f); 
-        glVertex3f( 1.0f, 0.0f, 0.5f);
-        glVertex3f( 0.0f, 0.0f, -0.5f);
+        glVertex3f(-1.0f, -0.5f, 0.0f); 
+        glVertex3f( 1.0f, -0.5f, 0.0f);
+        glVertex3f( 0.0f, 0.5f, 0.0f);
         glEnd();
         glPopMatrix();
     }
@@ -82,10 +85,7 @@ public:
         y += v;
     }
     void look() {
-        gluLookAt(0, 15, 20, 0, 0, 0, 0, 1, 0);
-        glRotated(ry, 0, 1, 0);
-        glRotated(rz, 0, 0, 1);
-        glRotated(rx, 1, 0, 0);
+        gluLookAt(0, -15, 10, 0, 0, 0, 0, 0, 1);
         glTranslated(-x, -y, -z);
     }
 };
@@ -237,7 +237,6 @@ void display() {
     display_ocean();
     display_map();
 
-    printf("vel: %.2f at (%.2f %.2f %.2f)\n", actual_ap->v, actual_ap->x, actual_ap->y, actual_ap->z);
 
     glutSwapBuffers();
 }
