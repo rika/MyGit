@@ -32,7 +32,7 @@ double FrustumFAR = 1000.0;
 /* ================================================================= */
 /* Velociy increments for translations and rotations */
 
-double DeltaVTrans = 0.75;
+double DeltaVTrans = 5.0;
 double DeltaVRoll  = 2.0;
 
 /* ================================================================= */
@@ -50,8 +50,8 @@ int idle = 1;                       // pause the simulator
 /* Material properties for the sea */
 
 GLfloat mat_diffuse_water[] = {(float) 0.2,(float) 0.4, (float)1.0, (float)1.0 };
-GLfloat mat_specular_water[] = {(float) 0.3, (float)0.5, (float)0.9, (float)1.0 };
-GLfloat mat_shininess_water[] = {(float) 60.0 };
+GLfloat mat_specular_water[] = {(float) 0.3, (float)0.4, (float)0.9, (float)1.0 };
+GLfloat mat_shininess_water[] = {(float) 40.0 };
 
 /* ================================================================= */
 /* Material properties for the island */
