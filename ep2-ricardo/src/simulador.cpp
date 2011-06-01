@@ -35,7 +35,6 @@
 #include <sstream>
 #include <list>
 #include "ep2.h"
-#include "bmp.h"
 
 using namespace std;
 
@@ -44,38 +43,29 @@ using namespace std;
 #define IDLE_INIT_TIME 33   // Tempo de sleep entre frames em milisegundos
 #define COS(a) cos(PI*(a)/180)
 #define SIN(a) sin(PI*(a)/180)
-#define IME_MAP "mapa_ime.bmp"
 
-// Variavel global
+// Variaveis global
 bool paused;
-int view_mode;
+int view_mode; // Tipo da vista da aeronave
 
-// textura do ime
-GLuint texture;
 
 /* **************************************************************************
     CLASSES
  ************************************************************************** */
 
-void print_v(double v[16]) {
-    int i = 0;
-    for(int j = 0; j < 16; j++) {
-        printf("%.2lf ", v[i]);
-        i += 4;
-        if(i >= 16) {
-            printf("\n");
-            i = i%4 + 1;
-        }
-    }
-    printf("pos        %.2lf    %.2lf    %.2lf\n", v[12], v[13], v[14]);
-    printf("z -direc   %.2lf:    %.2lf    %.2lf\n", v[8], v[9], v[10]);
-    printf("y up       %.2lf    %.2lf    %.2lf\n", v[4], v[5], v[6]);
-    printf("x right    %.2lf    %.2lf    %.2lf\n", v[0], v[1], v[2]);
-    printf("\n");
-}   
 
+/* Classe que guarda um vetor de 16 posicoes que representa um frame de
+   coordenadas, no estilo OpenGL, equivalendo a uma matriz de transformacao.
+
+   As posicoes do vetor equivalem as seguintes posicoes da matriz M:
+   M = 0  4  8 12
+       1  5  9 13
+       2  6 10 14
+       3  7 11 15
+*/
 class Frame {
 private:
+    // Transforma v na identidade
     void set_id(double v[16]) {
         for(int i = 0; i < 4; i++) {
             for(int j = 0; j < 4; j++)
@@ -84,15 +74,17 @@ private:
         }
     }    
 public:
+    // vetor guardando o frame de coordenadas
     double v[16];
     
+    // inicializa o frame na posicao x, y, z com as rotacoes Euler rx, ry, rz
     Frame (double x, double y, double z, double rx, double ry, double rz) {
         set_id(v);
         translate(x, y, z);
         rotate(rx, ry, rz);
     }
 
-    // pos mult
+    // pos-multiplica a v por op
     void mult(double op[16]) {
         double vt[16];
         double sum;
@@ -107,9 +99,12 @@ public:
         for(int i = 0; i < 16; i++) v[i] = vt[i];
     }
     
-    // RzRyRx
+    // rotaticiona v com as rotacoes de Euler rx, ry, rz
     void rotate(double rx, double ry, double rz) {
         double op[16];
+
+        // op guarda a matriz de rotacao RzRyRx
+        // sendo Rk a rotacao de rk no eixo k
         op[0] = COS(rz)*COS(ry);
         op[1] = SIN(rz)*COS(ry);
         op[2] = -1*SIN(ry);
@@ -131,6 +126,7 @@ public:
         mult(op);
     }
     
+    // translada v por x, y, z
     void translate(double x, double y, double z) {
         double op[16];
         set_id(op);
@@ -140,6 +136,7 @@ public:
         mult(op);
     }
     
+    // devolve o determinante de v
     double determinant() {
         double value;
         value =
@@ -152,6 +149,7 @@ public:
         return value;
     }
 
+    // guarda a inversa de v em inv
     void inverse(double inv[16]) {
         inv[0]  = v[6]*v[11]*v[13] - v[7]*v[10]*v[13] + v[7]*v[9]*v[14] - v[5]*v[11]*v[14] - v[6]*v[9]*v[15] + v[5]*v[10]*v[15];
         inv[1]  = v[3]*v[10]*v[13] - v[2]*v[11]*v[13] - v[3]*v[9]*v[14] + v[1]*v[11]*v[14] + v[2]*v[9]*v[15] - v[1]*v[10]*v[15];
@@ -174,8 +172,11 @@ public:
         for(int i = 0; i < 16; i++) inv[i] /= det;
     }
 
-    void print() {
+    // debug de v
+    void debug() {
         int i = 0;
+
+        printf("frame:\n");
         for(int j = 0; j < 16; j++) {
             printf("%.2lf ", v[i]);
             i += 4;
@@ -184,10 +185,10 @@ public:
                 i = i%4 + 1;
             }
         }
-        printf("pos        %.2lf    %.2lf    %.2lf\n", v[12], v[13], v[14]);
-        printf("z -direc   %.2lf    %.2lf    %.2lf\n", v[8], v[9], v[10]);
-        printf("y up       %.2lf    %.2lf    %.2lf\n", v[4], v[5], v[6]);
-        printf("x right    %.2lf    %.2lf    %.2lf\n", v[0], v[1], v[2]);
+        printf("posicao    %.2lf    %.2lf    %.2lf\n", v[12], v[13], v[14]);
+        printf("direcao    %.2lf    %.2lf    %.2lf\n", -v[8], -v[9], -v[10]); // -z
+        printf("up         %.2lf    %.2lf    %.2lf\n", v[4], v[5], v[6]);     // y
+        printf("right      %.2lf    %.2lf    %.2lf\n", v[0], v[1], v[2]);     // x
         printf("\n");
     }   
 };
@@ -209,6 +210,7 @@ public:
         roll = yaw = pitch = 0;
         frame = new Frame(x, y, z, rx, ry, rz);
     }
+    // desenha a aeronave
     void display() {
         glPushMatrix();
         glMultMatrixd(frame->v);
@@ -223,10 +225,12 @@ public:
         glEnd();
         glPopMatrix();
     }
+    // desloca e rotaciona a aeronave
     void move() {
         frame->translate(0, 0, -v);
         frame->rotate(pitch, yaw, roll);
     }
+    // setup da camera
     void look() {
         if(view_mode == 0)      gluLookAt(0, 0, 0, 0, 0, -1, 0, 1, -1);
         else if(view_mode == 1) gluLookAt(0, 10, 20, 0, 0, 0, 0, 1, 0);
@@ -235,6 +239,11 @@ public:
         double inv[16];
         frame->inverse(inv);
         glMultMatrixd(inv);
+    }
+    // debug
+    void debug() {
+        printf("NAVE %d\n", id);
+        frame->debug();
     }
 };
 
@@ -256,7 +265,9 @@ void display_map();
 void look_and_project();
 void display();
 void reshape();
+void debug();
 void step(int);
+void mouse(int, int, int, int);
 void mouse_motion(int, int);
 void keyboard(unsigned char, int, int);
 
@@ -268,15 +279,14 @@ void keyboard(unsigned char, int, int);
 
 void init() {
 
-    glClearColor(backR, backG, backB, backA);
+    // setup do opengl
     glEnable(GL_NORMALIZE);
-    
-    glShadeModel(GL_FLAT);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glShadeModel(GL_SMOOTH);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
 
+    // variaveis globais
     view_mode = 0;
     paused = false;
 
@@ -315,26 +325,10 @@ void init() {
         a = new Airplane(i, x, y, z, rx, ry, rz, v);
         ap_list.push_back(*a);
     }
-
-    AP = ap_list.begin();
     fclose(input);
 
-    // mapa do ime
-    Image* img;
-    img = (Image *) malloc(sizeof(Image));
-    if(ImageLoad(IME_MAP, img) == 0)
-        printf("Problema ao gerar o mapa de %s.\n", IME_MAP);
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, img->sizeX, img->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, img->data);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    if (img) {
-        if (img->data) free(img->data);
-        free(img);
-    }
-    
+    AP = ap_list.begin();
+    AP->debug();
 }
 
 
@@ -343,6 +337,7 @@ void init() {
  ************************************************************************** */
 
 
+// desenha o mapa de elevacao
 void display_elevation_map() {
     glPushMatrix();
     glTranslatef((float)iMinLX, (float)iMinLY, 0);
@@ -369,10 +364,10 @@ void display_elevation_map() {
     glPopMatrix();
 }
 
+// desenha o oceano
 void display_map() {
     glPushMatrix();
     glBegin(GL_QUADS);
-    glBindTexture(GL_TEXTURE_2D, texture);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse_water);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular_water);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess_water);
@@ -385,6 +380,7 @@ void display_map() {
     glPopMatrix();
 }
 
+// setup da camera e projecao
 void look_and_project() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -401,7 +397,8 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     look_and_project();
-   
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
     list<Airplane>::iterator a;
     for(a = ap_list.begin(); a != ap_list.end(); a++)
         a->display();
@@ -426,20 +423,45 @@ void reshape(int w, int h) {
  ************************************************************************** */
 
 
+// roda um passo da animacao
 void step(int t) {
     list<Airplane>::iterator a;
-
+    if (paused)
+        AP->debug();
     for (a = ap_list.begin(); a != ap_list.end(); a++)
         a->move();
-    glutPostRedisplay();
     if (!paused)
         glutTimerFunc(t, step, t);
+    glutPostRedisplay();
 }
 
 
 /* **************************************************************************
    FUNCOES DE INTERFACE COM O USUARIO
  ************************************************************************** */
+
+
+void mouse(int btn, int st, int x, int y) {
+    if(btn==GLUT_LEFT_BUTTON) {
+        if(st==GLUT_DOWN) {
+            if(paused)
+                glutTimerFunc(0, step, 0);
+            else
+                AP->debug();
+        }
+    }
+    if(btn==GLUT_RIGHT_BUTTON) {
+        if(st==GLUT_DOWN) {
+            if(paused) {
+                paused = false;
+                glutTimerFunc(0, step, IDLE_INIT_TIME);
+            }
+            else
+                paused = true;
+        }
+    }
+    glutPostRedisplay();
+}
 
 
 void mouse_motion (int x, int y) {
@@ -494,11 +516,13 @@ void keyboard(unsigned char key, int x, int y) {
             AP++;
             if(AP == ap_list.end())
                 AP = ap_list.begin();
+            AP->debug();
             break;
         case 'V':
             AP++;
             if(AP == ap_list.end())
                 AP = ap_list.begin();
+            AP->debug();
             break;
         case 'b':
             view_mode = (view_mode+1)%3;
@@ -524,6 +548,12 @@ void keyboard(unsigned char key, int x, int y) {
         case 'X':
             AP->roll = AP->yaw = AP->pitch = 0;
             break;
+        case ' ':
+            if(paused)
+                glutTimerFunc(0, step, 0);
+            else
+                AP->debug();
+            break;
         default:
             break;
     }
@@ -548,6 +578,7 @@ int main(int argc, char** argv) {
     glutTimerFunc(IDLE_INIT_TIME, step, IDLE_INIT_TIME);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
     glutPassiveMotionFunc(mouse_motion);
 
     glutMainLoop();

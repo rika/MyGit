@@ -11,17 +11,24 @@ Para compilar
 Para rodar: ./simulador
 
 Operação:
+  MOUSE
+  movimento na janela: rotaciona a nave atual (y:pitch  e x:yaw)
+  botao esquerdo: caso o jogo esteja parado roda um passo da execucao
+                  caso contrario imprime o debug da nave atual
+
   TECLADO
   a: acelera a nave atual
   s: acelera negativamente a nave atual
   d: para a nave atual
+  z/c: rotaciona a nave atual (roll)
+  x: zera todas as rotacoes da nave atual
   q: termina o programa
   p: pausa / despausa
   v: troca de aeronave
+  b: troca o tipo da visao
+  espaco: mesma funcao do botao esquerdo do mouse
 
-IMPORTANTE:
-Todas funcionalidades do ep nao foram concluidas, algumas observacoes importantes:
- - a parte de rotacao das naves nao foi implementada
- - somente uma pseudo movimentacao no eixo Y foi implementada
- - a ilha foi pintada com tons de verde, como nao foi disponibilizado o mapa de cores
+OBSERVACAO:
+  Nao sei o motivo, mas o oceano fica escuro quando visao da camera esta
+  paralela a ele ou enclinada para cima.
 
