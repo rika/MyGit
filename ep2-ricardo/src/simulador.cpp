@@ -3,15 +3,32 @@
  * Nome: Ricardo Juliano Mesquita Silva Oda
  * NUSP: 6514223
  *
- * Operação:
+ * Objetivo:
+ * Fazer uma animacao iterativa usando OpenGL.
  *
+ * Programa:
+ * O programa eh um simples simulador de voo, no qual sao exploradas as
+ * rotacoes em 3d, e mudancas de frame de coordendas para sua implementacao.
+ *
+ * Operação:
+ * 
+ * MOUSE
+ * movimento na janela: rotaciona a nave atual (y:pitch  e x:yaw)
+ * botao esquerdo: caso o jogo esteja parado roda um passo da execucao
+ *                 caso contrario imprime uma vez o debug da nave atual
+ * 
  * TECLADO
  * a: acelera a nave atual
  * s: acelera negativamente a nave atual
  * d: para a nave atual
+ * z/c: rotaciona a nave atual (roll)
+ * x: zera todas as rotacoes da nave atual
  * q: termina o programa
  * p: pausa / despausa
  * v: troca de aeronave
+ * b: troca o tipo da visao
+ * espaco: mesma funcao do botao esquerdo do mouse
+ * 
  *
  */
 
@@ -39,8 +56,8 @@
 using namespace std;
 
 // Defines
-#define PI 3.14159265
 #define IDLE_INIT_TIME 33   // Tempo de sleep entre frames em milisegundos
+#define PI 3.14159265
 #define COS(a) cos(PI*(a)/180)
 #define SIN(a) sin(PI*(a)/180)
 

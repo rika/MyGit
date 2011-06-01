@@ -11,10 +11,11 @@ Para compilar
 Para rodar: ./simulador
 
 Operação:
+
   MOUSE
   movimento na janela: rotaciona a nave atual (y:pitch  e x:yaw)
   botao esquerdo: caso o jogo esteja parado roda um passo da execucao
-                  caso contrario imprime o debug da nave atual
+                  caso contrario imprime uma vez o debug da nave atual
 
   TECLADO
   a: acelera a nave atual
@@ -27,8 +28,4 @@ Operação:
   v: troca de aeronave
   b: troca o tipo da visao
   espaco: mesma funcao do botao esquerdo do mouse
-
-OBSERVACAO:
-  Nao sei o motivo, mas o oceano fica escuro quando visao da camera esta
-  paralela a ele ou enclinada para cima.
 
