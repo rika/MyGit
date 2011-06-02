@@ -222,7 +222,7 @@ public:
 
     Airplane(int id, double x, double y, double z, double rx, double ry, double rz, double v) {
         this->id = id;
-        this->v = v;
+        this->v = v/IDLE_INIT_TIME;
         roll = yaw = pitch = 0;
         frame = new Frame(x, y, z, rx, ry, rz);
     }
