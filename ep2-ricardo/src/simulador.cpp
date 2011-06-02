@@ -206,7 +206,6 @@ public:
         printf("direcao    %.2lf    %.2lf    %.2lf\n", -v[8], -v[9], -v[10]); // -z
         printf("up         %.2lf    %.2lf    %.2lf\n", v[4], v[5], v[6]);     // y
         printf("right      %.2lf    %.2lf    %.2lf\n", v[0], v[1], v[2]);     // x
-        printf("\n");
     }   
 };
 
@@ -261,6 +260,8 @@ public:
     void debug() {
         printf("NAVE %d\n", id);
         frame->debug();
+        printf("vel %lf pitch %lf yaw %lf roll %lf\n", v, pitch, yaw, roll);
+        printf("\n");
     }
 };
 
