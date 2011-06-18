@@ -1,16 +1,22 @@
 CXXFLAGS=-O2 -Wall
 
 TARGET=tracer
-SOURCE=tracer.cpp, control.cpp
-OBJ=./obj/tracer.o, ./obj/control.o
+
+SDIR=./src
+
+_DEPS = control.h
+DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS))
+
+_OBJ = Control.o Tracer.o 
+OBJ = $(patsubst %,$(SDIR)/%,$(_OBJ))
 
 all: $(TARGET)
 
+$(SDIR)/%.o: $(SDIR)/%.cpp $(SDIR)/$(DEPS)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
 $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^
-
-./obj/tracer.o: ./src/tracer.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $^
 
 clean:
 	rm -f $(TARGET) $(OBJ)
