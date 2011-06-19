@@ -162,7 +162,9 @@ void Data::store_ppm()
     outfile << 255 << endl;
 
     for (int i = 0; i < size; i++) {
-        outfile << r[i] << g[i] << b[i];
+        outfile << (unsigned char) r[i];
+        outfile << (unsigned char) g[i];
+        outfile << (unsigned char) b[i];
         if (DEBUG)
             cout << (int) r[i] <<" "<< (int) g[i] <<" "<< (int) b[i] << endl;
     }
