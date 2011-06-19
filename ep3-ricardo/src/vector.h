@@ -17,6 +17,7 @@ public:
 	Vector* add(Vector* v);
 	Vector* sub(Vector* v);
 	Vector* mul(double d);
+	Vector* mul(Vector* v);
 	double dot_product(Vector* v);
 	Vector* cross_product(Vector* v);
 	double abs();

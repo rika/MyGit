@@ -98,11 +98,81 @@ public:
             }
         }
 
+        RGB* color = new RGB(0, 0, 0);
+
         if (target_obj != 0) {
             if (DEBUG) {
-                cout << "  with object " << target_obj->id << endl;
+                cout << "  Intesection with object " << target_obj->id << endl;
+                cout << "  t = " << d_min << endl;
+                cout << endl;
             }
-            return new RGB(target_obj->pigment->rgb);
+            
+            Vector* Q = p->add(ray->mul(d_min));
+            
+            Vector* norm = 0;
+            if (target_obj->type.compare("ESFE") == 0) {
+                norm = Q->sub(target_obj->position);
+                norm->normalize();
+            }
+
+
+            // ambient
+            RGB* ambient = new RGB(0, 0, 0);
+            Finish* f = target_obj->finish;
+            list<Light>::iterator light = (data->light_list).begin();
+            if (light != (data->light_list).end()) {
+                ambient = (ambient->add(light->rgb->mul(f->ka)))->mul(target_obj->pigment->rgb);
+                if(DEBUG) {
+                    cout << " LIGHT " << light->id << endl;
+                    cout << "  Ka: " << f->ka << endl;
+                    cout << "  Ambient light rgb: "; light->rgb->debug();
+                    cout << "  Ambient light component: "; ambient->debug();
+                    cout << endl;
+                }
+                light++;
+            }
+            
+            // specular
+            for (; light != (data->light_list).end(); light++) {
+                Vector *lray = Q->sub(light->position);
+                double ld = lray->abs();
+                lray->normalize();
+
+                bool visible = true;
+	            list<Object>::iterator obj = (data->object_list).begin();
+	            for(; obj != (data->object_list).end(); obj++) {
+	                if (&(*obj) == target_obj) continue;
+	                double d = intersect(light->position, lray, &(*obj));
+	                if (d < ld) visible = false;
+                }
+
+                if (visible) {
+                    double atenuation = light->a + light->b * ld + light->c * ld * ld;
+                    Vector* half = lray->add(ray)->mul(-1);
+                    half->normalize();
+                   
+                    double nh = norm->dot_product(half);
+                    double nh_alfa = pow(nh, f->alfa);
+                    if (nh_alfa > EPSILON) {
+                        double k = f->ks * nh_alfa / atenuation;
+                        color = color->add(light->rgb->mul(k));
+                    }
+                    if (DEBUG) {
+                        cout << " LIGHT " << light->id << endl;
+                        cout << "  distance: " << ld;
+                        cout << "  atenuation: " << atenuation << endl;
+                        cout << "  normal vector: "; norm->debug();
+                        cout << "  light vector: "; lray->debug();
+                        cout << "  half vector: "; half->debug();
+                        cout << "  dot_product(n,h)^alfa = " << nh_alfa << endl;
+                        cout << "  light rgb: "; light->rgb->debug();
+                        cout << "  partial color sum: "; color->debug();
+                        cout << endl;
+                    }
+                }
+            }
+
+            return ambient->add(color);
         }
         else {
             if (DEBUG) {
@@ -125,8 +195,6 @@ public:
             t = up - sq_delta;
             if (t > 0) {
                 if (DEBUG) {
-                    cout << "  Outter intersection" << endl;
-                    cout << "  t: " << t << endl;
                 }
                 return t;
             }
@@ -135,7 +203,6 @@ public:
             if (t > 0) {
                 if (DEBUG) {
                     cout << "  Inner intersection" << endl;
-                    cout << "  t: " << t << endl;
                 }
                 return t;
             }

@@ -44,6 +44,10 @@ Vector* Vector::mul(double d) {
     return new Vector(d*x, d*y, d*z);
 }
 
+Vector* Vector::mul(Vector* v) {
+    return new Vector(x*v->x, y*v->y, z*v->z);
+}
+
 double Vector::dot_product(Vector* v) {
     return this->x * v->x + this->y * v->y + this->z * v->z;
 }
