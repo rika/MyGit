@@ -6,6 +6,7 @@
 using namespace std;
 
 #define PI 3.14159265
+#define EPSILON 0.0001
 
 class Tracer {
 public:
@@ -107,7 +108,7 @@ public:
             if (DEBUG) {
                 cout << "  No intersection" << endl;
             }
-            return new RGB(0, 0, 0);
+            return new RGB(0.5, 0.5, 0.5); // BACKGROUND
         }
     }
 
@@ -141,8 +142,31 @@ public:
 
             return -1;
         }
-        else // TRIANGLE
-            return -1;
+        else if (obj->type.compare("TRIA") == 0) {
+            Vector* w1 = obj->p1->sub(obj->p0);
+            Vector* w2 = obj->p2->sub(obj->p0);
+
+            // determinant
+            double det = (-ray->x)*w1->y*w2->z - (-ray->x)*w2->y*w1->z +
+                         w1->x*w2->y*(-ray->z) - w1->x*(-ray->y)*w2->z +
+                         w2->x*(-ray->y)*w1->z - w2->x*w1->y*(-ray->z);
+
+            if (fabs(det) < EPSILON) // singular
+                return -1;
+
+            Vector* M1 = new Vector((w2->z*w1->y*(-w1->z)*w2->y)/det, -(w2->z*w1->x*(-w1->z)*w2->x)/det, w2->y*w1->x*(-w1->y)*w2->x/det);
+            Vector* M2 = new Vector(-(w2->z*(-ray->y)*ray->z*w2->y)/det, w2->z*(-ray->x)*ray->z*w2->x/det, -(w2->y*(-ray->x)*ray->y*w2->x)/det);
+            Vector* M3 = new Vector(w1->z*(-ray->y)*ray->z*w1->y/det, -(w1->z*(-ray->x)*ray->z*w1->x)/det, w1->y*(-ray->x)*ray->y*w1->x/det);
+            
+            double alfa1 = M2->dot_product(obj->p0);
+            double alfa2 = M3->dot_product(obj->p0);
+            if ( fabs(alfa1) < EPSILON || fabs(alfa2) < EPSILON || alfa1 + alfa2 > 1)
+                return -1;
+
+            return M1->dot_product(obj->p0);
+            
+        }
+        return -1;
     }
 };
 
