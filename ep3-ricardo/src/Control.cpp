@@ -6,7 +6,8 @@
 using namespace std;
 
 Control::Control (int argc, char* argv[]) {
-	if (argc < 5 || (argc >5 && strcmp(argv[5], "-d") != 0)) {
+    string d_opt = "-d";
+	if (argc < 5 || (argc >5 && d_opt.compare(argv[5]) != 0)) {
 		usage(argv);
 		exit(1);
 	}
