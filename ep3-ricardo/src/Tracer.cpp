@@ -39,6 +39,7 @@ public:
                         cout << "How many debug steps would you liek to skip: ";
                         cin >> skip;
                         cout << endl;
+                        DEBUG = false;
                     }
                     cout << "PIXEL (" << row << ", " << col << ")" << endl;
                 }
