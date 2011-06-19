@@ -91,9 +91,9 @@ Data::Data(Control* control) {
     infile >> nf;
 	if (DEBUG) cout << "nf: " << nf << endl;
 	for (int i = 0; i < nf; i++) {
-	    double ka, kd, ks, alfa, kr, kt, ior;
-	    infile >> ka >> kd >> ks >> alfa >> kr >> kt >> ior;
-	    Finish *finish = new Finish(i, ka, kd, ks, alfa, kr, kt, ior);
+	    double ka, kd, ks, alpha, kr, kt, ior;
+	    infile >> ka >> kd >> ks >> alpha >> kr >> kt >> ior;
+	    Finish *finish = new Finish(i, ka, kd, ks, alpha, kr, kt, ior);
 	    finish_array.push_back(*finish);
 	    if(DEBUG) finish->debug();
     }
@@ -228,26 +228,26 @@ void Pigment::debug() {
 
 // ==== FINISH ====
 
-Finish::Finish(int id, double ka, double kd, double ks, double alfa, double kr, double kt, double ior) {
+Finish::Finish(int id, double ka, double kd, double ks, double alpha, double kr, double kt, double ior) {
     this->id = id;
     this->ka = ka;
     this->kd = kd;
     this->ks = ks;
-    this->alfa = alfa;
+    this->alpha = alpha;
     this->kr = kr;
     this->kt = kt;
     this->ior = ior;
 }
 
 void Finish::debug() {
-    cout << " Finish " << id << endl;
-    cout << "  ka:   " << ka << endl;
-    cout << "  kd:   " << kd << endl;
-    cout << "  ks:   " << ks << endl;
-    cout << "  alfa: " << alfa << endl;
-    cout << "  kr:   " << kr << endl;
-    cout << "  kt:   " << kt << endl;
-    cout << "  ior:  " << ior << endl;
+    cout << " Finish  " << id << endl;
+    cout << "  ka:    " << ka << endl;
+    cout << "  kd:    " << kd << endl;
+    cout << "  ks:    " << ks << endl;
+    cout << "  alpha: " << alpha << endl;
+    cout << "  kr:    " << kr << endl;
+    cout << "  kt:    " << kt << endl;
+    cout << "  ior:   " << ior << endl;
     cout << endl;
 }
 

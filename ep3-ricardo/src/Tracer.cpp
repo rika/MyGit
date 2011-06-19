@@ -13,6 +13,7 @@ public:
     bool DEBUG;
     Data* data;
     RGB* rgb;
+    bool inner_flag;
 
     Tracer(Data* data, bool DEBUG) {
         this->DEBUG = DEBUG;
@@ -66,10 +67,6 @@ public:
         rgb->x = rgb->y = rgb->z = 0;
         rgb = rgb->add(trace(data->camera->position, ray, 0));
 
-        if (DEBUG) {
-            cout << "  Color: "; rgb->debug();
-        }
-
         int index = row*data->width + column;
         data->r[index] = (int)(255*rgb->x);
         data->g[index] = (int)(255*rgb->y);
@@ -83,6 +80,7 @@ public:
             cout << " Recursion: " << recursion << endl;
             cout << " Origin: "; p->debug();
             cout << " Ray:    "; ray->debug();
+            cout << endl;
         }
         
         Object * target_obj = 0;
@@ -143,7 +141,7 @@ public:
 	            list<Object>::iterator obj = (data->object_list).begin();
 	            for(; obj != (data->object_list).end(); obj++) {
 	                if (&(*obj) == target_obj) continue;
-	                double d = intersect(light->position, lray, &(*obj));
+	                double d = intersect(Q, lray, &(*obj));
 	                if (d < ld) visible = false;
                 }
 
@@ -164,10 +162,10 @@ public:
                     half->normalize();
 
                     double nh = norm->dot_product(half);
-                    double nh_alfa = pow(nh, f->alfa);
+                    double nh_alpha = pow(nh, f->alpha);
                     RGB* spec_comp = 0;
-                    if (nh_alfa > EPSILON) {
-                        double k = f->ks * nh_alfa / atenuation;
+                    if (nh_alpha > EPSILON) {
+                        double k = f->ks * nh_alpha / atenuation;
                         spec_comp = light->rgb->mul(k);
                         spec_color = spec_color->add(spec_comp);
                     }
@@ -185,7 +183,7 @@ public:
                         cout << "  partial sum (difuse)    "; difuse_color->debug();
                         cout << endl;
                         cout << "  half vector: "; half->debug();
-                        cout << "  dot_product(n,h)^alfa = " << nh_alfa << endl;
+                        cout << "  dot_product(n,h)^alpha = " << nh_alpha << endl;
                         cout << "  light rgb: "; light->rgb->debug();
                         if (spec_comp != 0)
                             cout << "  specular component:     "; spec_comp->debug();
@@ -193,21 +191,46 @@ public:
                         cout << endl;
                     }
                 }
-                else {
-                    if (DEBUG) {
-                        cout << " LIGHT " << light->id << " is not visible" << endl;
-                        cout << endl;
-                    }
-                }
             }
 
-            return ambient->add(spec_color)->add(difuse_color);
+            RGB* color = ambient->add(spec_color)->add(difuse_color);
+            if (DEBUG) {
+                cout << " Total sum (difuse): "; difuse_color->debug();
+                cout << " Total sum (spec):   "; spec_color->debug();
+                cout << endl;
+            }
+            
+            if (f->kr > EPSILON) {
+                Vector* reflection_v = (norm->mul(ray->mul(-1)->dot_product(norm)*2))->sub(ray);
+
+                if (DEBUG) {
+                    cout << " Refraction" << endl;
+                    cout << "  Kr: " << f->kr << endl;
+                    cout << "  Ray vector: "; reflection_v->debug();
+                    cout << endl;
+                }
+
+                RGB* reflection = (trace(Q, reflection_v, recursion+1))->mul(f->kr);
+                color = color->add(reflection);
+            }
+/*
+            RGB* refraction = (trace(Q, refraction_v, recursion+1))->mul(f->kt);
+            color = color->add(reflection);
+  */         
+            if (DEBUG) {
+                cout << " Color: "; color->debug();
+            }
+            return color;
+
         }
         else {
+            RGB* bg = new RGB(0.5, 0.5, 0.5);
             if (DEBUG) {
-                cout << "  No intersection" << endl;
+                cout << " No intersection" << endl;
+                cout << " Background: "; bg->debug();
+                cout << endl;
             }
-            return new RGB(0.5, 0.5, 0.5); // BACKGROUND
+            return bg;
         }
     }
 
@@ -223,16 +246,13 @@ public:
             
             t = up - sq_delta;
             if (t > 0) {
-                if (DEBUG) {
-                }
+                inner_flag = true;
                 return t;
             }
 
             t = up + sq_delta;
             if (t > 0) {
-                if (DEBUG) {
-                    cout << "  Inner intersection" << endl;
-                }
+                inner_flag = true;
                 return t;
             }
 
@@ -245,9 +265,9 @@ public:
 
             if (M->inverse()) {
                 Vector* v = M->pos_mul(obj->p0);
-                double alfa1 = v->y;
-                double alfa2 = v->z;
-                if ( fabs(alfa1) < EPSILON || fabs(alfa2) < EPSILON || alfa1 + alfa2 > 1)
+                double alpha1 = v->y;
+                double alpha2 = v->z;
+                if ( fabs(alpha1) < EPSILON || fabs(alpha2) < EPSILON || alpha1 + alpha2 > 1)
                     return -1;
 
                 return v->x;
@@ -261,8 +281,7 @@ int main(int argc, char* argv[]) {
 
     Control* control = new Control(argc, argv);
     Data* data = new Data(control);
-    Tracer* tracer = new Tracer(data, control->DEBUG);
-
+    new Tracer(data, control->DEBUG);
 
     return 0;
 }

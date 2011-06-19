@@ -82,8 +82,8 @@ public:
 class Finish {
 public:
     int id;
-	double ka, kd, ks, alfa, kr, kt, ior;
-	Finish(int id, double ka, double kd, double ks, double alfa, double kr, double kt, double ior);
+	double ka, kd, ks, alpha, kr, kt, ior;
+	Finish(int id, double ka, double kd, double ks, double alpha, double kr, double kt, double ior);
 	void debug();
 };
 
