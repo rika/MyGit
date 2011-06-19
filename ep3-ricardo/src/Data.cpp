@@ -161,13 +161,8 @@ void Data::store_ppm()
     outfile << width << " " << height << endl;
     outfile << 255 << endl;
 
-    for (int i = 0; i < size; i++) {
-        outfile << r[i];
-        outfile << g[i];
-        outfile << b[i];
-        if (DEBUG)
-            cout << (int) r[i] <<" "<< (int) g[i] <<" "<< (int) b[i] << endl;
-    }
+    for (int i = 0; i < size; i++)
+        outfile << r[i] << g[i] << b[i];
     
     outfile.close();
     
@@ -178,14 +173,13 @@ void Data::store_ppm()
 // ==== CAMERA ====
 
 Camera::Camera(Point* position, Vector* view, Vector* up, double fovy) {
-    view->normalize();
-    up->normalize();
     this->position = position;
     this->view = view;
-	this->up = view->mul(up->dot_product(view));
-	this->up = up->sub(this->up);
+    this->view->normalize();
+	this->right = view->cross_product(up);
+	this->right->normalize();
+	this->up = this->right->cross_product(this->view);
 	this->up->normalize();
-	this->right = view->cross_product(this->up);
 	this->fovy = fovy;
 }
 
