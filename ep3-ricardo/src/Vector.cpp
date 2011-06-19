@@ -4,6 +4,11 @@
 #include "vector.h"
 using namespace std;
 
+#define EPSILON 0.0001
+
+Vector::Vector() {
+    x = y = z = 0;
+}
 
 Vector::Vector(Vector* v) {
     x = v->x;
@@ -58,4 +63,36 @@ void Vector::normalize() {
     z /= a;
 }
 
+Matrix::Matrix(double a11, double a12, double a13,
+               double a21, double a22, double a23,
+               double a31, double a32, double a33) {
+    row[0].x = a11; row[0].y = a12; row[0].z = a13;
+    row[1].x = a21; row[1].y = a22; row[1].z = a23;
+    row[2].x = a31; row[2].y = a32; row[2].z = a33;
+}
 
+Vector* Matrix::pos_mul(Vector* t) {
+    return new Vector(row[0].dot_product(t), row[1].dot_product(t), row[2].dot_product(t));
+}
+
+bool Matrix::inverse() {
+    double det = row[0].x * row[1].y * row[2].z - (row[0].x * row[1].z * row[2].y) +
+                 row[0].y * row[1].z * row[2].x - (row[0].y * row[1].x * row[2].z) +
+                 row[0].z * row[1].x * row[2].y - (row[0].z * row[1].y * row[2].x);
+
+    if (fabs(det) < EPSILON) return false;
+
+    row[0].x = (row[1].y * row[2].z - row[1].z * row[2].y)/det;
+    row[0].y = (row[0].z * row[2].y - row[0].y * row[2].z)/det;
+    row[0].z = (row[0].y * row[1].z - row[0].z * row[1].y)/det;
+
+    row[1].x = (row[1].z * row[2].x - row[1].x * row[2].z)/det;
+    row[1].y = (row[0].x * row[2].z - row[0].z * row[2].x)/det;
+    row[1].z = (row[0].z * row[1].x - row[0].x * row[1].z)/det;
+
+    row[2].x = (row[1].x * row[2].y - row[1].y * row[2].x)/det;
+    row[2].y = (row[0].y * row[2].x - row[0].x * row[2].y)/det;
+    row[2].z = (row[0].x * row[1].y - row[0].y * row[1].x)/det;
+
+    return true;
+}

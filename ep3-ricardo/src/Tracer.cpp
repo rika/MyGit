@@ -143,28 +143,19 @@ public:
             return -1;
         }
         else if (obj->type.compare("TRIA") == 0) {
-            Vector* w1 = obj->p1->sub(obj->p0);
-            Vector* w2 = obj->p2->sub(obj->p0);
+            Matrix* M = new Matrix(-ray->x, obj->p1->x - obj->p0->x, obj->p2->x - obj->p0->x,
+                                   -ray->y, obj->p1->y - obj->p0->y, obj->p2->y - obj->p0->y,
+                                   -ray->z, obj->p1->z - obj->p0->z, obj->p2->z - obj->p0->z);
 
-            // determinant
-            double det = (-ray->x)*w1->y*w2->z - (-ray->x)*w2->y*w1->z +
-                         w1->x*w2->y*(-ray->z) - w1->x*(-ray->y)*w2->z +
-                         w2->x*(-ray->y)*w1->z - w2->x*w1->y*(-ray->z);
+            if (M->inverse()) {
+                Vector* v = M->pos_mul(obj->p0);
+                double alfa1 = v->y;
+                double alfa2 = v->z;
+                if ( fabs(alfa1) < EPSILON || fabs(alfa2) < EPSILON || alfa1 + alfa2 > 1)
+                    return -1;
 
-            if (fabs(det) < EPSILON) // singular
-                return -1;
-
-            Vector* M1 = new Vector((w2->z*w1->y*(-w1->z)*w2->y)/det, -(w2->z*w1->x*(-w1->z)*w2->x)/det, w2->y*w1->x*(-w1->y)*w2->x/det);
-            Vector* M2 = new Vector(-(w2->z*(-ray->y)*ray->z*w2->y)/det, w2->z*(-ray->x)*ray->z*w2->x/det, -(w2->y*(-ray->x)*ray->y*w2->x)/det);
-            Vector* M3 = new Vector(w1->z*(-ray->y)*ray->z*w1->y/det, -(w1->z*(-ray->x)*ray->z*w1->x)/det, w1->y*(-ray->x)*ray->y*w1->x/det);
-            
-            double alfa1 = M2->dot_product(obj->p0);
-            double alfa2 = M3->dot_product(obj->p0);
-            if ( fabs(alfa1) < EPSILON || fabs(alfa2) < EPSILON || alfa1 + alfa2 > 1)
-                return -1;
-
-            return M1->dot_product(obj->p0);
-            
+                return v->x;
+            }
         }
         return -1;
     }
