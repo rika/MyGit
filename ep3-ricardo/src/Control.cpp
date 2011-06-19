@@ -1,5 +1,7 @@
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <stdlib.h>
 #include "control.h"
 using namespace std;
 
