@@ -15,9 +15,9 @@ Data::Data(Control* control) {
     width = control->width;
     height = control->height;
     int size = width * height;
-    r = new char[size];
-    g = new char[size];
-    b = new char[size];
+    r = new unsigned char[size];
+    g = new unsigned char[size];
+    b = new unsigned char[size];
 
     open_files(control->infile_n, control->outfile_n);
 
