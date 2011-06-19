@@ -145,7 +145,10 @@ public:
 	            for(; obj != (data->object_list).end(); obj++) {
 	                if (obj->id == target_obj->id) continue;
 	                double d = intersect(Q, lray, &(*obj));
-	                if (d < ld) visible = false;
+	                if (d != -1) {
+	                    visible = false;
+	                    break;
+                    }
                 }
 
 
@@ -249,7 +252,7 @@ public:
             
             t = up - sq_delta;
             if (t > 0) {
-                inner_flag = true;
+                inner_flag = false;
                 return t;
             }
 
