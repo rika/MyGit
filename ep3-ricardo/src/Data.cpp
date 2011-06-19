@@ -15,9 +15,9 @@ Data::Data(Control* control) {
     width = control->width;
     height = control->height;
     int size = width * height;
-    r = new unsigned char[size];
-    g = new unsigned char[size];
-    b = new unsigned char[size];
+    r = new char[size];
+    g = new char[size];
+    b = new char[size];
 
     open_files(control->infile_n, control->outfile_n);
 
@@ -162,9 +162,9 @@ void Data::store_ppm()
     outfile << 255 << endl;
 
     for (int i = 0; i < size; i++) {
-        outfile << (unsigned char) r[i];
-        outfile << (unsigned char) g[i];
-        outfile << (unsigned char) b[i];
+        outfile << r[i];
+        outfile << g[i];
+        outfile << b[i];
         if (DEBUG)
             cout << (int) r[i] <<" "<< (int) g[i] <<" "<< (int) b[i] << endl;
     }
