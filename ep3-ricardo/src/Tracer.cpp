@@ -56,8 +56,8 @@ public:
 
         double r = 0.5 + (double) row;
         double c = 0.5 + (double) column;
-        double ex = (w/2.0) - (c*w/data->width);
-        double ey = (r*h/data->height) - (h/2.0);
+        double ex = (c*w/data->width) - (w/2.0);
+        double ey = (h/2.0) - (r*h/data->height);
 
         Vector* rx = data->camera->right->mul(ex);
         Vector* ry = data->camera->up->mul(ey);
