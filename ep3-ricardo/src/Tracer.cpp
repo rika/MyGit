@@ -130,10 +130,10 @@ public:
                 light++;
             }
             
+            // light dependent reflections
             RGB* spec_color = new RGB(0, 0, 0);
             RGB* difuse_color = new RGB(0, 0, 0);
 
-            // specular
             for (; light != (data->light_list).end(); light++) {
                 Vector *lray = light->position->sub(Q);
                 double ld = lray->abs();
@@ -150,32 +150,52 @@ public:
 
                 if (visible) {
                     double atenuation = light->a + light->b * ld + light->c * ld * ld;
-                    Vector* half = lray->sub(ray);
-                    half->normalize();
-                   
-                    double nh = norm->dot_product(half);
-                    double nh_alfa = pow(nh, f->alfa);
-                    if (nh_alfa > EPSILON) {
-                        double k = f->ks * nh_alfa / atenuation;
-                        spec_color = spec_color->add(light->rgb->mul(k));
+
+                    // difuse reflection
+                    double nl = norm->dot_product(lray);
+                    RGB* difuse_comp = 0;
+                    if (nl > EPSILON) {
+                        difuse_comp = (light->rgb->mul(target_obj->pigment->rgb))->mul(nl*f->kd/atenuation);
+                        difuse_color = difuse_color->add(difuse_comp);
                     }
 
-                    double nl = norm->dot_product(lray);
-                    if (nl > EPSILON)
-                        difuse_color = difuse_color->add(target_obj->pigment->rgb->mul(nl)->mul(f->kd));
+                    // specular reflection
+                    Vector* half = lray->sub(ray);
+                    half->normalize();
+
+                    double nh = norm->dot_product(half);
+                    double nh_alfa = pow(nh, f->alfa);
+                    RGB* spec_comp = 0;
+                    if (nh_alfa > EPSILON) {
+                        double k = f->ks * nh_alfa / atenuation;
+                        spec_comp = light->rgb->mul(k);
+                        spec_color = spec_color->add(spec_comp);
+                    }
 
                     if (DEBUG) {
                         cout << " LIGHT " << light->id << endl;
-                        cout << "  distance: " << ld;
-                        cout << "  atenuation: " << atenuation << endl;
+                        cout << "  distance: " << ld << "  atenuation: " << atenuation << endl;
                         cout << "  normal vector: "; norm->debug();
                         cout << "  light vector: "; lray->debug();
+                        cout << "  light rgb: "; light->rgb->debug();
+                        cout << endl;
+                        cout << "  dot_product(n,l) = " << nl << endl;
+                        if (difuse_comp != 0)
+                            cout << "  difuse component:       "; difuse_comp->debug();
+                        cout << "  partial sum (difuse)    "; difuse_color->debug();
+                        cout << endl;
                         cout << "  half vector: "; half->debug();
                         cout << "  dot_product(n,h)^alfa = " << nh_alfa << endl;
                         cout << "  light rgb: "; light->rgb->debug();
+                        if (spec_comp != 0)
+                            cout << "  specular component:     "; spec_comp->debug();
+                        cout << "  partial sum (specular): "; spec_color->debug();
                         cout << endl;
-                        cout << "  partial specular sum: "; spec_color->debug();
-                        cout << "  partial difuse sum:   "; difuse_color->debug();
+                    }
+                }
+                else {
+                    if (DEBUG) {
+                        cout << " LIGHT " << light->id << " is not visible" << endl;
                         cout << endl;
                     }
                 }
