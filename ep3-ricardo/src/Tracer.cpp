@@ -76,7 +76,7 @@ public:
 	        cout << endl << "=========================================" << endl << endl;
             cout << "rgb debug:"; rgb->debug();
             cout << "RGB: " << endl;
-            cout << data->r[index] << " " << data->g[index] << " " << data->b[index] << endl;
+            cout << (int) data->r[index] << " " << (int) data->g[index] << " " << (int) data->b[index] << endl;
 	        cout << endl << "=========================================" << endl << endl;
         }
     }
