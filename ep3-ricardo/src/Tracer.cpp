@@ -143,9 +143,8 @@ public:
                 bool visible = true;
 	            list<Object>::iterator obj = (data->object_list).begin();
 	            for(; obj != (data->object_list).end(); obj++) {
-	                if (obj->id == target_obj->id) continue;
 	                double d = intersect(Q, lray, &(*obj));
-	                if (d != -1) {
+	                if (d != -1 && fabs(d) > EPSILON) {
 	                    visible = false;
 	                    break;
                     }
