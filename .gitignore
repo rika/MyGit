@@ -1,6 +1,11 @@
 *.o
 trecos
 simulador
+tracer
+run
+in
+out
+h_out
 *.swp
 .project
 .cproject

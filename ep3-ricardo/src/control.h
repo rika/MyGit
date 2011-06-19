@@ -1,21 +1,21 @@
-#ifdef _CONTROL_H_
+#ifndef _CONTROL_H_
 #define _CONTROL_H_
+
+#include <fstream>
+using namespace std;
 
 class Control;
 
 class Control {
-    public:
+public:
     bool DEBUG;
     char* infile_n;
     char* outfile_n;
-    ifstream infile;
-    ofstream outfile;
     int width, height;
 
     Control (int argc, char* argv[]);
-    void parse_args(int argc, char* argv[]);
-    void open_files();
     void usage(char* argv[]);
 };
 
 #endif // _CONTROL_H_
+

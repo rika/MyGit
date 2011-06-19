@@ -4,10 +4,10 @@ TARGET=tracer
 
 SDIR=./src
 
-_DEPS = control.h
+_DEPS = control.h data.h vector.h
 DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS))
 
-_OBJ = Control.o Tracer.o 
+_OBJ = Tracer.o Control.o Data.o Vector.o
 OBJ = $(patsubst %,$(SDIR)/%,$(_OBJ))
 
 all: $(TARGET)
