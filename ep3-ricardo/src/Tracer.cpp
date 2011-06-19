@@ -28,7 +28,7 @@ public:
 
         for (int row = 0; row < data->height; row++) {
             for (int col = 0; col < data->width; col++) {
-                if (skip > 0) {
+                if (skip != 0) {
                     this->DEBUG = false;
                     skip--;
                 }
@@ -41,7 +41,7 @@ public:
                     }
                 }
 
-                if (debug && skip <= 0) {
+                if (debug && skip == 0) {
                     this->DEBUG = true;
                     cout << "PIXEL (" << row << ", " << col << ")" << endl;
                 }
@@ -144,12 +144,11 @@ public:
 	            list<Object>::iterator obj = (data->object_list).begin();
 	            for(; obj != (data->object_list).end(); obj++) {
 	                double d = intersect(Q, lray, &(*obj));
-	                if (d != -1 && fabs(d) > EPSILON) {
+	                if (d != -1 && d < ld) {
 	                    visible = false;
 	                    break;
                     }
                 }
-
 
                 if (visible) {
                     double atenuation = light->a + light->b * ld + light->c * ld * ld;
@@ -250,13 +249,13 @@ public:
             sq_delta = sqrt(up * up - pp + r*r);
             
             t = up - sq_delta;
-            if (t > 0) {
+            if (t > EPSILON) {
                 inner_flag = false;
                 return t;
             }
 
             t = up + sq_delta;
-            if (t > 0) {
+            if (t > EPSILON) {
                 inner_flag = true;
                 return t;
             }
