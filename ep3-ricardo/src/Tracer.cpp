@@ -19,8 +19,6 @@ public:
         this->DEBUG = DEBUG;
         this->data = data;
         
-        rgb = new RGB(0, 0, 0);
-
         int skip = 0;
         bool debug = DEBUG;
         double h = 2 * tan(data->camera->fovy/2 * PI/180);
@@ -67,8 +65,7 @@ public:
         Vector* ray = data->camera->view->add(ry)->add(rx);
         ray->normalize();
 
-        rgb->x = rgb->y = rgb->z = 0;
-        rgb = rgb->add(trace(data->camera->position, ray, 0));
+        rgb = trace(data->camera->position, ray, 0);
 
         int index = row*data->width + column;
         data->r[index] = (int)(255*rgb->x);
