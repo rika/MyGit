@@ -68,9 +68,9 @@ public:
         rgb = trace(data->camera->position, ray, 0);
 
         int index = row*data->width + column;
-        data->r[index] = (int)(255*rgb->x);
-        data->g[index] = (int)(255*rgb->y);
-        data->b[index] = (int)(255*rgb->z);
+        data->r[index] = (unsigned char)(255*rgb->x);
+        data->g[index] = (unsigned char)(255*rgb->y);
+        data->b[index] = (unsigned char)(255*rgb->z);
     }
 
     RGB* trace(Point* p, Vector* ray, int recursion) {

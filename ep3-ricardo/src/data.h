@@ -33,7 +33,7 @@ public:
 	vector<Pigment> pigment_array;
 	vector<Finish> finish_array;
 	list<Object> object_list;
-	char *r, *g, *b;
+	unsigned char *r, *g, *b;
 
 
 	Data(Control* control);
