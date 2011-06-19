@@ -143,7 +143,7 @@ public:
                 bool visible = true;
 	            list<Object>::iterator obj = (data->object_list).begin();
 	            for(; obj != (data->object_list).end(); obj++) {
-	                if (&(*obj) == target_obj) continue;
+	                if (obj->id == target_obj->id) continue;
 	                double d = intersect(Q, lray, &(*obj));
 	                if (d < ld) visible = false;
                 }
