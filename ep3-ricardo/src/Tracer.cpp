@@ -98,8 +98,6 @@ public:
             }
         }
 
-        RGB* color = new RGB(0, 0, 0);
-
         if (target_obj != 0) {
             if (DEBUG) {
                 cout << "  Intesection with object " << target_obj->id << endl;
@@ -132,9 +130,12 @@ public:
                 light++;
             }
             
+            RGB* spec_color = new RGB(0, 0, 0);
+            RGB* difuse_color = new RGB(0, 0, 0);
+
             // specular
             for (; light != (data->light_list).end(); light++) {
-                Vector *lray = Q->sub(light->position);
+                Vector *lray = light->position->sub(Q);
                 double ld = lray->abs();
                 lray->normalize();
 
@@ -146,17 +147,23 @@ public:
 	                if (d < ld) visible = false;
                 }
 
+
                 if (visible) {
                     double atenuation = light->a + light->b * ld + light->c * ld * ld;
-                    Vector* half = lray->add(ray)->mul(-1);
+                    Vector* half = lray->sub(ray);
                     half->normalize();
                    
                     double nh = norm->dot_product(half);
                     double nh_alfa = pow(nh, f->alfa);
                     if (nh_alfa > EPSILON) {
                         double k = f->ks * nh_alfa / atenuation;
-                        color = color->add(light->rgb->mul(k));
+                        spec_color = spec_color->add(light->rgb->mul(k));
                     }
+
+                    double nl = norm->dot_product(lray);
+                    if (nl > EPSILON)
+                        difuse_color = difuse_color->add(target_obj->pigment->rgb->mul(nl)->mul(f->kd));
+
                     if (DEBUG) {
                         cout << " LIGHT " << light->id << endl;
                         cout << "  distance: " << ld;
@@ -166,13 +173,15 @@ public:
                         cout << "  half vector: "; half->debug();
                         cout << "  dot_product(n,h)^alfa = " << nh_alfa << endl;
                         cout << "  light rgb: "; light->rgb->debug();
-                        cout << "  partial color sum: "; color->debug();
+                        cout << endl;
+                        cout << "  partial specular sum: "; spec_color->debug();
+                        cout << "  partial difuse sum:   "; difuse_color->debug();
                         cout << endl;
                     }
                 }
             }
 
-            return ambient->add(color);
+            return ambient->add(spec_color)->add(difuse_color);
         }
         else {
             if (DEBUG) {
