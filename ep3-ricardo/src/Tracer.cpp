@@ -11,22 +11,18 @@ class Tracer {
 public:
     bool DEBUG;
     Data* data;
-    char * r, * g, * b;
+    RGB* rgb;
 
     Tracer(Data* data, bool DEBUG) {
         this->DEBUG = DEBUG;
         this->data = data;
         
-        r = new char[data->width * data->height];
-        g = new char[data->width * data->height];
-        b = new char[data->width * data->height];
+        rgb = new RGB(0, 0, 0);
 
         int skip = 0;
         bool debug = DEBUG;
         double h = 2 * tan(data->camera->fovy/2 * PI/180);
         double w = data->width / (double) data->height * h;
-        cout << "w: "<< w << " h: "<< h << endl;
-	    cout << endl << "=========================================" << endl << endl;
 
         for (int row = 0; row < data->height; row++) {
             for (int col = 0; col < data->width; col++) {
@@ -49,9 +45,9 @@ public:
 
                 if (DEBUG)
 	                cout << endl << "=========================================" << endl << endl;
-
             }
         }
+        data->store_ppm();
     }
 
     void ray_trace(int row, int column, double w, double h) {
@@ -66,106 +62,94 @@ public:
         Vector* ray = data->camera->view->add(ry)->add(rx);
         ray->normalize();
 
-        trace(data->camera->position, ray, 0);
-    }
-
-    void trace(Point* p, Vector* ray, int recursion) {
-        if (recursion >= 5) return;
+        rgb->x = rgb->y = rgb->z = 0;
+        rgb = rgb->add(trace(data->camera->position, ray, 0));
 
         if (DEBUG) {
-            cout << "Recursion: " << recursion << endl;
-            cout << "Origin: "; p->debug();
-            cout << "Ray:    "; ray->debug();
+            cout << "  Color: "; rgb->debug();
+        }
+
+        int index = row*data->width + column;
+        data->r[index] = (int)(255*rgb->x);
+        data->g[index] = (int)(255*rgb->y);
+        data->b[index] = (int)(255*rgb->z);
+    }
+
+    RGB* trace(Point* p, Vector* ray, int recursion) {
+        if (recursion >= 5) return new RGB(0, 0, 0);
+
+        if (DEBUG) {
+            cout << " Recursion: " << recursion << endl;
+            cout << " Origin: "; p->debug();
+            cout << " Ray:    "; ray->debug();
         }
         
-        int id = -1;
+        Object * target_obj = 0;
+        double d = -1;
         double d_min = 10000000;
-	    list<Sphere>::iterator sphere = (data->sphere_list).begin();
-	    for(; sphere != (data->sphere_list).end(); sphere++) {
-            double d = intersect_sphere(p, ray, &(*sphere));
+	    list<Object>::iterator obj = (data->object_list).begin();
+	    for(; obj != (data->object_list).end(); obj++) {
+	        d = intersect(p, ray, &(*obj));
+
             if (d != -1 && d < d_min) {
                 d_min = d;
-                id = sphere->id;
+                target_obj = &(*obj);
             }
         }
 
-	    list<Triangle>::iterator triangle = (data->triangle_list).begin();
-	    for(; triangle != (data->triangle_list).end(); triangle++) {
-            double d = intersect_triangle(p, ray, &(*triangle));
-            if (d != -1 && d < d_min) {
-                d_min = d;
-                id = triangle->id;
+        if (target_obj != 0) {
+            if (DEBUG) {
+                cout << "  with object " << target_obj->id << endl;
             }
-        }
-
-        if (id != -1) {
-            // calc + trace rec
+            return new RGB(target_obj->pigment->rgb);
         }
         else {
             if (DEBUG) {
-                cout << "No intersection" << endl;
+                cout << "  No intersection" << endl;
             }
-            return; // fundo
+            return new RGB(0, 0, 0);
         }
     }
 
-    double intersect_sphere(Point* origin, Vector* ray, Sphere* sphere) {
-        double up, pp, sq_delta, t;
-        cout << "esfera! " << sphere->radius << endl;
-        up = ray->dot_product(sphere->position);
-        pp = sphere->position->dot_product(sphere->position);
-        sq_delta = sqrt(up * up - pp + sphere->radius*sphere->radius);
-        
-        t = up - sq_delta;
-        if (t > 0) {
-            if (DEBUG) {
-                cout << "Outter intersection" << endl;
-                cout << "t: " << t << endl;
+    double intersect(Point* origin, Vector* ray, Object *obj) {
+	    if (obj->type.compare("ESFE") == 0) {
+            Vector * p;
+            double up, pp, r, sq_delta, t;
+            p = obj->position->sub(origin);
+            up = ray->dot_product(p);
+            pp = p->dot_product(p);
+            r =  obj->radius;
+            sq_delta = sqrt(up * up - pp + r*r);
+            
+            t = up - sq_delta;
+            if (t > 0) {
+                if (DEBUG) {
+                    cout << "  Outter intersection" << endl;
+                    cout << "  t: " << t << endl;
+                }
+                return t;
             }
-            return t;
-        }
 
-        t = up + sq_delta;
-        if (t > 0) {
-            if (DEBUG) {
-                cout << "Inner intersection" << endl;
-                cout << "t: " << t << endl;
+            t = up + sq_delta;
+            if (t > 0) {
+                if (DEBUG) {
+                    cout << "  Inner intersection" << endl;
+                    cout << "  t: " << t << endl;
+                }
+                return t;
             }
-            return t;
+
+            return -1;
         }
-
-        return -1;
-    }
-
-    double intersect_triangle(Point* origin, Vector* ray, Triangle* triangle) {
-        return -1;
-    }
-
-    void StorePPM (int w, int h, char *r, char *g, char *b, char *file_name)
-    {
-        int size = w * h;
-
-        FILE *file_fp;
-        if ((file_fp =  fopen(file_name,"w")) == NULL) {
-            printf("Can't open file %s \n",file_name);
-            exit (0);
-        }
-
-        fprintf(file_fp,"%s\n%i %i\n%i\n", "P6",w,h,255);
-
-        for (int i=0; i < size; i++) {
-            putc(*r++, file_fp);
-            putc(*g++, file_fp);
-            putc(*b++, file_fp);
-        }
-        fclose(file_fp);
+        else // TRIANGLE
+            return -1;
     }
 };
 
 int main(int argc, char* argv[]) {
 
     Control* control = new Control(argc, argv);
-    Data* data = new Data(control->width, control->height, control->infile_n, control->outfile_n, control->DEBUG);
+    Data* data = new Data(control);
     Tracer* tracer = new Tracer(data, control->DEBUG);
 
 

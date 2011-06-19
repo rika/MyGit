@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "vector.h"
+#include "control.h"
 using namespace std;
 
 #define RGB Vector
@@ -31,11 +32,13 @@ public:
 	list<Light> light_list; 
 	vector<Pigment> pigment_array;
 	vector<Finish> finish_array;
-	list<Sphere> sphere_list;
-	list<Triangle> triangle_list;
+	list<Object> object_list;
+	char *r, *g, *b;
 
-	Data(int width, int height, char* infile_n, char* outfile_n, bool DEBUG);
+
+	Data(Control* control);
 	void open_files(char* infile_n, char* outfile_n);
+	void store_ppm();
 };
 
 
@@ -89,26 +92,15 @@ class Object {
 public:
     int id;
 	string type;
-	int pigment;
-	int finish;
-	Object(int id, string type, int pigment, int finish);
-	void super_debug();
-};
-
-
-class Sphere: public Object {
-public:
+	Pigment * pigment;
+	Finish * finish;
+	// sphere
 	Point* position;
 	double radius;
-	Sphere(int id, string type, int pigment, int finish, Point* position, double radius);
-	void debug();
-};
-
-
-class Triangle: public Object {
-public:
+	Object(int id, string type, Pigment* pigment, Finish* finish, Point* position, double radius);
+	// triangle
 	Point * p0, * p1, * p2;
-	Triangle(int id, string type, int pigment, int finish, Point* p0, Point* p1, Point* p2);
+	Object(int id, string type, Pigment* pigment, Finish* finish, Point* p0, Point* p1, Point* p2);
 	void debug();
 };
 

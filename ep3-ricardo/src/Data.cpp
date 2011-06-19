@@ -9,11 +9,15 @@ using namespace std;
 
 // ==== DATA =====
 
-Data::Data(int width, int height, char* infile_n, char* outfile_n, bool DEBUG) {
-	this->DEBUG = DEBUG;
-    this->width = width;
-    this->height = height;
-    open_files(infile_n, outfile_n);
+Data::Data(Control* control) {
+	DEBUG = control->DEBUG;
+    width = control->width;
+    height = control->height;
+    r = new char[width * height];
+    g = new char[width * height];
+    b = new char[width * height];
+
+    open_files(control->infile_n, control->outfile_n);
 
 	double x0, y0, z0, x1, y1, z1;
 	Point * position;
@@ -101,15 +105,19 @@ Data::Data(int width, int height, char* infile_n, char* outfile_n, bool DEBUG) {
     infile >> no;
     if (DEBUG) cout << "no: " << no << endl;
     for (int i = 0; i < no; i++) {
-        int pigment, finish;
+        int pigment_id, finish_id;
+        Pigment * pigment;
+        Finish * finish;
         string type;
-        infile >> pigment >> finish >> type;
+        infile >> pigment_id >> finish_id >> type;
+        pigment = &(pigment_array[pigment_id]);
+        finish = &(finish_array[finish_id]);
         if(type.compare("ESFE") == 0) {
             double x, y, z, radius;
             infile >> x >> y >> z >> radius;
             Point* p = new Point(x, y, z);
-            Sphere *sphere = new Sphere(i, type, pigment, finish, p, radius);
-            sphere_list.push_back(*sphere);
+            Object *sphere = new Object(i, type, pigment, finish, p, radius);
+            object_list.push_back(*sphere);
             if(DEBUG) sphere->debug();
         }
         else if (type.compare("TRIA") == 0) {
@@ -119,13 +127,15 @@ Data::Data(int width, int height, char* infile_n, char* outfile_n, bool DEBUG) {
             p0 = new Point(x0, y0, z0);
             p1 = new Point(x1, y1, z1);
             p2 = new Point(x2, y2, z2);
-            Triangle *triangle = new Triangle(i, type, pigment, finish, p0, p1, p2);
-            triangle_list.push_back(*triangle);
+            Object *triangle = new Object(i, type, pigment, finish, p0, p1, p2);
+            object_list.push_back(*triangle);
             if(DEBUG) triangle->debug();
         }
     }
     if (DEBUG)
 	    cout << endl << "=========================================" << endl << endl;
+
+	infile.close();
 }
 
 void Data::open_files(char* infile_n, char* outfile_n) {
@@ -139,6 +149,23 @@ void Data::open_files(char* infile_n, char* outfile_n) {
 		cout << " ERROR: Could not open/create: " << outfile_n << endl;
 		exit(1);
 	}
+}
+
+void Data::store_ppm()
+{
+    int size = width * height;
+
+    outfile << "P6" << endl;
+    outfile << width << " " << height << endl;
+    outfile << 255 << endl;
+
+    for (int i = 0; i < size; i++)
+        outfile << r[i] << g[i] << b[i];
+    
+    outfile.close();
+    
+    if (DEBUG)
+        cout << "Image done" << endl;
 }
 
 // ==== CAMERA ====
@@ -225,48 +252,44 @@ void Finish::debug() {
 
 // ==== OBJECT ====
 
-Object::Object(int id, string type, int pigment, int finish) {
-    this->id = id;
-    this->type = type;
-    this->pigment = pigment;
-    this->finish = finish;
-}
-
-void Object::super_debug() {
+void Object::debug() {
     cout << " Object " << id << endl;
     cout << "  Type: " << type << endl;
-    cout << "  Pigment: " << pigment << endl;
-    cout << "  Finish: " << finish << endl;
+    cout << "  Pigment: " << pigment->id << endl;
+    cout << "  Finish: " << finish->id << endl;
+
+    if (type.compare("ESFE") == 0) {
+        cout << "  Position: "; this->position->debug();
+        cout << "  Radius: " << radius << endl;
+    }
+    if (type.compare("TRIA") == 0) {
+        cout << "  p0: "; this->p0->debug();
+        cout << "  p1: "; this->p1->debug();
+        cout << "  p2: "; this->p2->debug();
+    }
+    cout << endl;
 }
 
 // ==== SPHERE ====
 
-Sphere::Sphere(int id, string type, int pigment, int finish, Point* position, double radius): Object(id, type, pigment, finish) {
+Object::Object(int id, string type, Pigment* pigment, Finish* finish, Point* position, double radius) {
+    this->id = id;
+    this->type = type;
+    this->pigment = pigment;
+    this->finish = finish;
     this->position = position;
     this->radius = radius;
 }
 
-void Sphere::debug() {
-    this->super_debug();
-    cout << "  Position: "; this->position->debug();
-    cout << "  Radius: " << radius << endl;
-    cout << endl;
-}
-
 // ==== TRIANGLE ====
 
-Triangle::Triangle(int id, string type, int pigment, int finish, Point* p0, Point* p1, Point* p2): Object(id, type, pigment, finish) {
+Object::Object(int id, string type, Pigment* pigment, Finish* finish, Point* p0, Point* p1, Point* p2) {
+    this->id = id;
+    this->type = type;
+    this->pigment = pigment;
+    this->finish = finish;
     this->p0 = p0;
     this->p1 = p1;
     this->p2 = p2;
 }
-
-void Triangle::debug() {
-    this->super_debug();
-    cout << "  p0: "; this->p0->debug();
-    cout << "  p1: "; this->p1->debug();
-    cout << "  p2: "; this->p2->debug();
-    cout << endl;
-}
-
 
