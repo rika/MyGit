@@ -28,25 +28,27 @@ public:
 
         for (int row = 0; row < data->height; row++) {
             for (int col = 0; col < data->width; col++) {
-                if (debug && skip <= 0)
-                    DEBUG = true;
-                else {
-                    DEBUG = false;
+                if (skip > 0) {
+                    this->DEBUG = false;
                     skip--;
                 }
-                if (DEBUG) {
+
+                if (this->DEBUG) {
                     if (row != 0 || col != 0) {
                         cout << "How many debug steps would you liek to skip: ";
                         cin >> skip;
                         cout << endl;
-                        DEBUG = false;
                     }
+                }
+
+                if (debug && skip <= 0) {
+                    this->DEBUG = true;
                     cout << "PIXEL (" << row << ", " << col << ")" << endl;
                 }
 
                 ray_trace(row, col, w, h); 
 
-                if (DEBUG)
+                if (this->DEBUG)
 	                cout << endl << "=========================================" << endl << endl;
             }
         }
