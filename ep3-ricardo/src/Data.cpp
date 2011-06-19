@@ -14,9 +14,10 @@ Data::Data(Control* control) {
 	DEBUG = control->DEBUG;
     width = control->width;
     height = control->height;
-    r = new char[width * height];
-    g = new char[width * height];
-    b = new char[width * height];
+    int size = width * height;
+    r = new char[size];
+    g = new char[size];
+    b = new char[size];
 
     open_files(control->infile_n, control->outfile_n);
 
@@ -160,8 +161,11 @@ void Data::store_ppm()
     outfile << width << " " << height << endl;
     outfile << 255 << endl;
 
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++) {
         outfile << r[i] << g[i] << b[i];
+        if (DEBUG)
+            cout << (int) r[i] <<" "<< (int) g[i] <<" "<< (int) b[i] << endl;
+    }
     
     outfile.close();
     
