@@ -68,9 +68,9 @@ public:
         rgb = trace(data->camera->position, ray, 0);
 
         int index = row*data->width + column;
-        data->r[index] = (char)(255*rgb->x);
-        data->g[index] = (char)(255*rgb->y);
-        data->b[index] = (char)(255*rgb->z);
+        data->r[index] = (rgb->x < 1)?(char)(255*rgb->x):(char)255;
+        data->g[index] = (rgb->y < 1)?(char)(255*rgb->y):(char)255;
+        data->b[index] = (rgb->z < 1)?(char)(255*rgb->z):(char)255;
         
         if (DEBUG) {
 	        cout << endl << "=========================================" << endl << endl;
