@@ -71,6 +71,14 @@ public:
         data->r[index] = (unsigned char)(255*rgb->x);
         data->g[index] = (unsigned char)(255*rgb->y);
         data->b[index] = (unsigned char)(255*rgb->z);
+        
+        if (DEBUG) {
+	        cout << endl << "=========================================" << endl << endl;
+            cout << "rgb debug:"; rgb->debug();
+            cout << "RGB: " << endl;
+            cout << data->r[index] << " " << data->g[index] << " " << data->b[index] << endl;
+	        cout << endl << "=========================================" << endl << endl;
+        }
     }
 
     RGB* trace(Point* p, Vector* ray, int recursion) {
