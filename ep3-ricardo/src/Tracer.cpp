@@ -214,10 +214,10 @@ public:
                 RGB* reflection = (trace(Q, reflection_v, recursion+1))->mul(f->kr);
                 color = color->add(reflection);
             }
-/*
+        /*
             RGB* refraction = (trace(Q, refraction_v, recursion+1))->mul(f->kt);
             color = color->add(reflection);
-  */         
+        */         
             if (DEBUG) {
                 cout << " Color: "; color->debug();
             }
@@ -258,7 +258,7 @@ public:
             }
 
             return -1;
-        }
+        }/*
         else if (obj->type.compare("TRIA") == 0) {
             Matrix* M = new Matrix(-ray->x, obj->p1->x - obj->p0->x, obj->p2->x - obj->p0->x,
                                    -ray->y, obj->p1->y - obj->p0->y, obj->p2->y - obj->p0->y,
@@ -273,7 +273,7 @@ public:
 
                 return v->x;
             }
-        }
+        }*/
         return -1;
     }
 };

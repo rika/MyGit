@@ -73,7 +73,7 @@ public:
     int id;
 	string type;
 	RGB* rgb;
-	// supondo somente SOLI
+	// only SOLI
 	Pigment(int id, string type, RGB* rgb);
 	void debug();
 };

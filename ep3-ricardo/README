@@ -1,0 +1,38 @@
+Ep3 - MAC0420 Computacao grafica
+
+Nome: Ricardo Juliano Mesquita Silva Oda
+NUSP: 6514223
+email: oda.ric@gmail.com
+
+Para compilar
+    make
+
+Para rodar:
+    ./tracer INFILE OUTFILE WIDTH HEIGHT -d
+
+    INFILE   nome do arquivo de entrada
+    OUTFILE  nome do arquivo de saida
+    WIDTH    largura da imagem
+    HEIGHT   altura da imagem
+    -d       liga o modo de depuracao
+
+    No modo de depuracao, se for passado um numero negativo ele pula
+    todos os passos seguintes.
+
+OBS: Nao foram implementados:
+    - Objeto:
+        - Triangulo
+    - Pigmento:
+        - Quadriculado
+    - Luz:
+        - Reflexao (nao esta funcionando direito)
+        - Refracao
+    
+    Nao ocorre nenhum erro no programa se sao passados, alguns desses
+    parametros na entrada, contudo ele vai ignora-los ou no caso da
+    reflexao renderizar incorretamente.
+
+    O resto foi implementado (Esferas, pigmento solido, e as outras luzes).
+    Como nao consegui terminar, o codigo talvez esteja meio complicado.
+
+
